@@ -18,13 +18,15 @@ namespace PlaneARViewer
         public double velocity;
         public double vert_rate;
         public double heading;
+        public Int32 last_update;
 
-        public Plane(Graphic p_graphic, double p_velocity, double p_vert_rate, double p_heading)
+        public Plane(Graphic p_graphic, double p_velocity, double p_vert_rate, double p_heading, Int32 p_last_update)
         {
             graphic = p_graphic;
             velocity = p_velocity;
             vert_rate = p_vert_rate;
             heading = p_heading;
+            last_update = p_last_update;
         }
     }
 
@@ -32,7 +34,8 @@ namespace PlaneARViewer
     {
         private Timer _animationTimer;
         private Dictionary<String, Plane> planes = new Dictionary<String, Plane>();
-        private ModelSceneSymbol plane3DSymbol;
+        private ModelSceneSymbol smallPlane3DSymbol;
+        private ModelSceneSymbol largePlane3DSymbol;
         private SpatialReference sr;
 
         private static readonly HttpClient client = new HttpClient();
@@ -50,6 +53,14 @@ namespace PlaneARViewer
 
         // Overlay for testing plane graphics.
         private GraphicsOverlay _graphicsOverlay;
+
+
+
+        public int updates_per_second = 5;
+        public int seconds_per_query = 10;
+        public int small_plane_size = 200;
+        public int large_plane_size = 200;
+        public int seconds_per_cleanup = 30;
 
         public ViewController(IntPtr handle) : base(handle)
         {
@@ -98,11 +109,12 @@ namespace PlaneARViewer
                 _arView.AtmosphereEffect = AtmosphereEffect.None;
 
                 _arView.Scene.BaseSurface.Opacity = 0.5;
+                _arView.Scene.BaseSurface.NavigationConstraint = NavigationConstraint.StayAbove;
 
                 sr = SpatialReferences.Wgs84;
 
-                String modelPath = GetModelPath();
-                plane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(modelPath), 50.0);
+                smallPlane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(GetSmallPlane()), small_plane_size);
+                largePlane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(GetLargePlane()), large_plane_size);
 
                 _graphicsOverlay = new GraphicsOverlay();
                 _graphicsOverlay.SceneProperties.SurfacePlacement = SurfacePlacement.Absolute;
@@ -119,7 +131,7 @@ namespace PlaneARViewer
                 queryPlanes();
 
 
-                _animationTimer = new Timer(1000)
+                _animationTimer = new Timer(1000 / updates_per_second)
                 {
                     Enabled = true,
                     AutoReset = true
@@ -203,7 +215,7 @@ namespace PlaneARViewer
             base.ViewDidAppear(animated);
 
             // Start tracking as soon as the view has been shown.
-            await _arView.StartTrackingAsync(ARLocationTrackingMode.Continuous);
+            await _arView.StartTrackingAsync(ARLocationTrackingMode.Initial);
         }
 
         public override async void ViewDidDisappear(bool animated)
@@ -223,10 +235,10 @@ namespace PlaneARViewer
             {
                 int max_planes = 0;
                 // var response = await client.GetAsync("https://matt9678:Window430@opensky-network.org/api/states/all");
-                //var response = await client.GetAsync("https://matt9678:Window430@opensky-network.org/api/states/all?lamin=31.87845&lomin=-119.81135&lamax=34.98221&lomax=-114.54345");
-                var response = await client.GetAsync("https://opensky-network.org/api/states/all?lamin=33.82&lomin=-117.781&lamax=34.616&lomax=-115.712");
+                var response = await client.GetAsync("https://matt9678:Window430@opensky-network.org/api/states/all?lamin=33.82&lomin=-117.781&lamax=34.616&lomax=-115.712");
                 var responseString = await response.Content.ReadAsStringAsync();
-
+                Int32 time_message_sent = Convert.ToInt32(responseString.Substring(8, 10));
+                Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
                 String states = responseString.Substring(30, responseString.Length - 30);
                 String[] elements = states.Split('[');
 
@@ -240,6 +252,7 @@ namespace PlaneARViewer
                     if (attributes[5] != "null" || attributes[5] != "null")
                     {
                         String callsign = attributes[1].Substring(1, attributes[1].Length - 2);
+                        Int32 last_timestamp = 0;
                         double lon = Convert.ToDouble(attributes[5]);
                         double lat = Convert.ToDouble(attributes[6]);
                         double alt = 0.0;
@@ -267,23 +280,52 @@ namespace PlaneARViewer
                         {
                             vert_rate = Convert.ToDouble(attributes[11]);
                         }
-                        Geometry g = new MapPoint(lon, lat, alt, sr);
+                        if (attributes[3] != "null")
+                        {
+                            last_timestamp = Convert.ToInt32(attributes[3]);
+                        }
+                        MapPoint g = new MapPoint(lon, lat, alt, sr);
+                        Int32 time_difference = unixTimestamp - last_timestamp;
+
+                        List<MapPoint> lmp = new List<MapPoint>();
+                        lmp.Add(g);
+                        IReadOnlyList<MapPoint> new_location = GeometryEngine.MoveGeodetic(lmp, velocity * time_difference, LinearUnits.Meters, heading, AngularUnits.Degrees, GeodeticCurveType.Geodesic);
+                        double dz = new_location[0].Z + (vert_rate * time_difference);
+                        MapPoint ng = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
+
                         if (planes.ContainsKey(callsign))
                         {
                             Plane currPlane = planes[callsign];
-                            currPlane.graphic.Geometry = g;
+                            currPlane.graphic.Geometry = ng;
+                            currPlane.graphic.IsSelected = true;
                             currPlane.graphic.Attributes["HEADING"] = heading + 180;
                             currPlane.velocity = velocity;
                             currPlane.vert_rate = vert_rate;
                             currPlane.heading = heading;
+                            currPlane.last_update = last_timestamp;
                         }
                         else
                         {
-                            Graphic gr = new Graphic(g, plane3DSymbol);
-                            gr.Attributes["HEADING"] = heading + 180;
-                            Plane p = new Plane(gr, velocity, vert_rate, heading);
-                            planes.Add(callsign, p);
-                            _graphicsOverlay.Graphics.Add(gr);
+                            
+                            if(true)
+                            {
+                                Graphic gr = new Graphic(ng, smallPlane3DSymbol);
+                                gr.Attributes["HEADING"] = heading;
+                                gr.IsSelected = true;
+                                Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp);
+                                planes.Add(callsign, p);
+                                _graphicsOverlay.Graphics.Add(gr);
+                            }
+                            else
+                            {
+                                Graphic gr = new Graphic(ng, largePlane3DSymbol);
+                                gr.Attributes["HEADING"] = heading + 180;
+                                gr.IsSelected = true;
+                                Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp);
+                                planes.Add(callsign, p);
+                                _graphicsOverlay.Graphics.Add(gr);
+                            }
+
                         }
                     }
                 }
@@ -297,7 +339,19 @@ namespace PlaneARViewer
         private void AnimatePlane(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             updateCounter++;
-            if (updateCounter % 10 == 0)
+            if(updateCounter % (seconds_per_cleanup * updates_per_second) == 0)
+            {
+                Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                foreach (var plane in planes)
+                {
+                    if (unixTimestamp - plane.Value.last_update < seconds_per_cleanup)
+                    {
+                        _graphicsOverlay.Graphics.Remove(plane.Value.graphic);
+                        planes.Remove(plane.Key);
+                    }
+                }
+            }
+            if (updateCounter % (updates_per_second * seconds_per_query) == 0)
             {
                 queryPlanes();
             }
@@ -308,18 +362,23 @@ namespace PlaneARViewer
                     MapPoint g = (MapPoint)plane.Value.graphic.Geometry;
                     List<MapPoint> lmp = new List<MapPoint>();
                     lmp.Add(g);
-                    IReadOnlyList<MapPoint> new_location = GeometryEngine.MoveGeodetic(lmp, plane.Value.velocity, LinearUnits.Meters, plane.Value.heading, AngularUnits.Degrees, GeodeticCurveType.Geodesic);
-                    double dz = new_location[0].Z + plane.Value.vert_rate;
+                    IReadOnlyList<MapPoint> new_location = GeometryEngine.MoveGeodetic(lmp, plane.Value.velocity / updates_per_second, LinearUnits.Meters, plane.Value.heading, AngularUnits.Degrees, GeodeticCurveType.Geodesic);
+                    double dz = new_location[0].Z + (plane.Value.vert_rate / updates_per_second);
                     MapPoint ng = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
                     plane.Value.graphic.Geometry = ng;
+                    plane.Value.graphic.IsSelected = false;
                 }
             }
         }
 
-        private static string GetModelPath()
+        private static string GetSmallPlane()
         {
-            //DataManager.DownloadDataItem("681d6f7694644709a7c830ec57a2d72b");
-            //return DataManager.GetDataFolder("681d6f7694644709a7c830ec57a2d72b", "Bristol.dae");
+            DataManager.DownloadDataItem("681d6f7694644709a7c830ec57a2d72b");
+            return DataManager.GetDataFolder("681d6f7694644709a7c830ec57a2d72b", "Bristol.dae");
+        }
+
+        private static string GetLargePlane()
+        {
             DataManager.DownloadDataItem("21274c9a36f445db912c7c31d2eb78b7");
             return DataManager.GetDataFolder("21274c9a36f445db912c7c31d2eb78b7", "Boeing787", "B_787_8.dae");
         }
