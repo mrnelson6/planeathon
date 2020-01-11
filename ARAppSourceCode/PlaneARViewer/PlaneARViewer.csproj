@@ -62,7 +62,6 @@
     <AppExtensionDebugBundleId />
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AdjustableLocationDataSource.cs" />
     <Compile Include="DataManager.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
@@ -74,6 +73,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Entitlements.plist" />
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
+    <Compile Include="Calibration\AdjustableLocationDataSource.cs" />
+    <Compile Include="Calibration\PanCompassCalibrator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -136,6 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
+    <Folder Include="Calibration\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>
