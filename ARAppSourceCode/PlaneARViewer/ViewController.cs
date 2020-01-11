@@ -10,6 +10,8 @@ using UIKit;
 using System.Net.Http;
 using System.Timers;
 
+using PlaneARViewer.Calibration;
+
 namespace PlaneARViewer
 {
     public class Plane
@@ -50,6 +52,8 @@ namespace PlaneARViewer
 
         // Overlay for testing plane graphics.
         private GraphicsOverlay _graphicsOverlay;
+
+        private PanCompassCalibrationGestureRecognizer _panCalibrator;
 
         public ViewController(IntPtr handle) : base(handle)
         {
@@ -135,6 +139,9 @@ namespace PlaneARViewer
 
                 // Get the elevation value.
                 _arView.LocationDataSource.LocationChanged += UpdateElevation;
+
+                _panCalibrator = new PanCompassCalibrationGestureRecognizer(_locationSource);
+                View.GestureRecognizers = new[] { _panCalibrator };
             }
             catch(Exception ex)
             {

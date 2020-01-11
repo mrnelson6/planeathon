@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Location;
 
-namespace PlaneARViewer
+namespace PlaneARViewer.Calibration
 {
     /// <summary>
     /// Wraps the built-in location data source to enable altitude adjustment.
@@ -19,7 +19,11 @@ namespace PlaneARViewer
     public class AdjustableLocationDataSource : LocationDataSource
     {
         // Track the altitude offset and raise location changed event when it is updated.
-        private double _altitudeOffset = 0;
+        private double _altitudeOffset;
+        private double _headingValue;
+        private double _manualElevation;
+        private bool _useManualElevation = false;
+
         public double AltitudeOffset
         {
             get => _altitudeOffset;
@@ -34,6 +38,21 @@ namespace PlaneARViewer
             }
         }
 
+        public double HeadingValue
+        {
+            get => _headingValue;
+            set
+            {
+                _headingValue = value;
+                _baseSource_HeadingChanged(_baseSource, _headingValue);
+            }
+        }
+
+        public Location LastLocation
+        {
+            get => _lastLocation;
+        }
+
         // Track the last location provided by the system.
         private Location _lastLocation;
 
@@ -43,7 +62,6 @@ namespace PlaneARViewer
         public AdjustableLocationDataSource()
         {
             _baseSource = new SystemLocationDataSource();
-            _baseSource.HeadingChanged += _baseSource_HeadingChanged;
             _baseSource.LocationChanged += _baseSource_LocationChanged;
         }
 
@@ -53,10 +71,21 @@ namespace PlaneARViewer
             _lastLocation = e;
 
             // Create the offset map point.
-            MapPoint newPosition = new MapPoint(e.Position.X, e.Position.Y, e.Position.Z + AltitudeOffset, e.Position.SpatialReference);
+            MapPoint newPosition;
+
+            if (_useManualElevation)
+            {
+                newPosition = new MapPoint(e.Position.X, e.Position.Y, _manualElevation,
+                e.Position.SpatialReference);
+            }
+            else
+            {
+                newPosition = new MapPoint(e.Position.X, e.Position.Y, e.Position.Z + AltitudeOffset,
+                e.Position.SpatialReference);
+            }
 
             // Create a new location from the map point.
-            Location newLocation = new Location(newPosition, e.HorizontalAccuracy, e.Velocity, e.Course, e.IsLastKnown);
+            Location newLocation = new Location(newPosition, e.HorizontalAccuracy, e.Velocity, _headingValue, e.IsLastKnown);
 
             // Call the base UpdateLocation implementation.
             UpdateLocation(newLocation);
@@ -65,6 +94,16 @@ namespace PlaneARViewer
         private void _baseSource_HeadingChanged(object sender, double e)
         {
             UpdateHeading(e);
+        }
+
+        /// <summary>
+        /// Set known elevation and stop updating
+        /// </summary>
+        /// <param name="elevation"></param>
+        public void SetKnownElevation(double elevation)
+        {
+            _useManualElevation = true;
+            _manualElevation = elevation;
         }
 
         protected override Task OnStartAsync() => _baseSource.StartAsync();
