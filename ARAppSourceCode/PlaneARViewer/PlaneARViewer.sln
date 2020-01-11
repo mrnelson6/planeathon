@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlaneARViewer", "PlaneARViewer.csproj", "{BE099BEE-D4E6-4E79-8164-B1CC80CF31CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|iPhone = Debug|iPhone
+		Debug|iPhoneSimulator = Debug|iPhoneSimulator
+		Release|iPhone = Release|iPhone
+		Release|iPhoneSimulator = Release|iPhoneSimulator
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BE099BEE-D4E6-4E79-8164-B1CC80CF31CC}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{BE099BEE-D4E6-4E79-8164-B1CC80CF31CC}.Debug|iPhone.Build.0 = Debug|iPhone
+		{BE099BEE-D4E6-4E79-8164-B1CC80CF31CC}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{BE099BEE-D4E6-4E79-8164-B1CC80CF31CC}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{BE099BEE-D4E6-4E79-8164-B1CC80CF31CC}.Release|iPhone.ActiveCfg = Release|iPhone
+		{BE099BEE-D4E6-4E79-8164-B1CC80CF31CC}.Release|iPhone.Build.0 = Release|iPhone
+		{BE099BEE-D4E6-4E79-8164-B1CC80CF31CC}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{BE099BEE-D4E6-4E79-8164-B1CC80CF31CC}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {09DD4F9A-B155-4F66-98B2-51D879461FC6}
+	EndGlobalSection
+EndGlobal

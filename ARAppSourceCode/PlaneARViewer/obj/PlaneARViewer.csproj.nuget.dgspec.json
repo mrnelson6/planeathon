@@ -1,0 +1,66 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj",
+        "projectName": "PlaneARViewer",
+        "projectPath": "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj",
+        "packagesPath": "C:\\Users\\matt9678\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "fallbackFolders": [
+          "C:\\Microsoft\\Xamarin\\NuGet\\"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\matt9678\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "xamarinios10"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Users\\matt9678\\AppData\\Local\\Esri\\NuGet": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "xamarinios10": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "xamarinios10": {
+          "dependencies": {
+            "Esri.ArcGISRuntime.ARToolkit": {
+              "target": "Package",
+              "version": "[100.7.0, )"
+            },
+            "Xamarin.Essentials": {
+              "target": "Package",
+              "version": "[1.3.1, )"
+            }
+          }
+        }
+      },
+      "runtimes": {
+        "win": {
+          "#import": []
+        },
+        "win-x64": {
+          "#import": []
+        },
+        "win-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,975 @@
+{
+  "version": 3,
+  "targets": {
+    "Xamarin.iOS,Version=v1.0": {
+      "Esri.ArcGISRuntime.ARToolkit/100.7.0": {
+        "type": "package",
+        "dependencies": {
+          "Esri.ArcGISRuntime.Xamarin.iOS": "100.7.0"
+        },
+        "frameworkAssemblies": [
+          "System.Drawing.Common.dll"
+        ],
+        "compile": {
+          "lib/xamarinios10/Esri.ArcGISRuntime.ARToolkit.dll": {}
+        },
+        "runtime": {
+          "lib/xamarinios10/Esri.ArcGISRuntime.ARToolkit.dll": {}
+        }
+      },
+      "Esri.ArcGISRuntime.Xamarin.iOS/100.7.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "OpenTK-1.0",
+          "Xamarin.iOS"
+        ],
+        "compile": {
+          "lib/Xamarin.iOS10/Esri.ArcGISRuntime.dll": {}
+        },
+        "runtime": {
+          "lib/Xamarin.iOS10/Esri.ArcGISRuntime.dll": {}
+        },
+        "resource": {
+          "lib/Xamarin.iOS10/ar/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ar"
+          },
+          "lib/Xamarin.iOS10/bs/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "bs"
+          },
+          "lib/Xamarin.iOS10/ca/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ca"
+          },
+          "lib/Xamarin.iOS10/cs/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "cs"
+          },
+          "lib/Xamarin.iOS10/da/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "da"
+          },
+          "lib/Xamarin.iOS10/de/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "de"
+          },
+          "lib/Xamarin.iOS10/el/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "el"
+          },
+          "lib/Xamarin.iOS10/es/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "es"
+          },
+          "lib/Xamarin.iOS10/et/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "et"
+          },
+          "lib/Xamarin.iOS10/fi/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "fi"
+          },
+          "lib/Xamarin.iOS10/fr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "fr"
+          },
+          "lib/Xamarin.iOS10/he/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "he"
+          },
+          "lib/Xamarin.iOS10/hi/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "hi"
+          },
+          "lib/Xamarin.iOS10/hr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "hr"
+          },
+          "lib/Xamarin.iOS10/hu/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "hu"
+          },
+          "lib/Xamarin.iOS10/id/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "id"
+          },
+          "lib/Xamarin.iOS10/it/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "it"
+          },
+          "lib/Xamarin.iOS10/ja/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ja"
+          },
+          "lib/Xamarin.iOS10/ko/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ko"
+          },
+          "lib/Xamarin.iOS10/lt/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "lt"
+          },
+          "lib/Xamarin.iOS10/lv/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "lv"
+          },
+          "lib/Xamarin.iOS10/nb-NO/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "nb-NO"
+          },
+          "lib/Xamarin.iOS10/nl/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "nl"
+          },
+          "lib/Xamarin.iOS10/no/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "no"
+          },
+          "lib/Xamarin.iOS10/pl/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "pl"
+          },
+          "lib/Xamarin.iOS10/pt-BR/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "pt-BR"
+          },
+          "lib/Xamarin.iOS10/pt-PT/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "pt-PT"
+          },
+          "lib/Xamarin.iOS10/ro/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ro"
+          },
+          "lib/Xamarin.iOS10/ru/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ru"
+          },
+          "lib/Xamarin.iOS10/sl/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "sl"
+          },
+          "lib/Xamarin.iOS10/sr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "sr"
+          },
+          "lib/Xamarin.iOS10/sv/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "sv"
+          },
+          "lib/Xamarin.iOS10/th/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "th"
+          },
+          "lib/Xamarin.iOS10/tr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "tr"
+          },
+          "lib/Xamarin.iOS10/uk/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "uk"
+          },
+          "lib/Xamarin.iOS10/vi/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "vi"
+          },
+          "lib/Xamarin.iOS10/zh-CN/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-CN"
+          },
+          "lib/Xamarin.iOS10/zh-HK/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-HK"
+          },
+          "lib/Xamarin.iOS10/zh-Hans/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-Hans"
+          },
+          "lib/Xamarin.iOS10/zh-TW/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-TW"
+          }
+        },
+        "build": {
+          "buildTransitive/Xamarin.iOS10/Esri.ArcGISRuntime.Xamarin.iOS.targets": {}
+        }
+      },
+      "System.Numerics.Vectors/4.5.0": {
+        "type": "package",
+        "compile": {
+          "ref/xamarinios10/_._": {}
+        },
+        "runtime": {
+          "lib/xamarinios10/_._": {}
+        }
+      },
+      "Xamarin.Essentials/1.3.1": {
+        "type": "package",
+        "dependencies": {
+          "System.Numerics.Vectors": "4.5.0"
+        },
+        "frameworkAssemblies": [
+          "OpenTK-1.0"
+        ],
+        "compile": {
+          "lib/xamarinios10/Xamarin.Essentials.dll": {}
+        },
+        "runtime": {
+          "lib/xamarinios10/Xamarin.Essentials.dll": {}
+        }
+      }
+    },
+    "Xamarin.iOS,Version=v1.0/win": {
+      "Esri.ArcGISRuntime.ARToolkit/100.7.0": {
+        "type": "package",
+        "dependencies": {
+          "Esri.ArcGISRuntime.Xamarin.iOS": "100.7.0"
+        },
+        "frameworkAssemblies": [
+          "System.Drawing.Common.dll"
+        ],
+        "compile": {
+          "lib/xamarinios10/Esri.ArcGISRuntime.ARToolkit.dll": {}
+        },
+        "runtime": {
+          "lib/xamarinios10/Esri.ArcGISRuntime.ARToolkit.dll": {}
+        }
+      },
+      "Esri.ArcGISRuntime.Xamarin.iOS/100.7.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "OpenTK-1.0",
+          "Xamarin.iOS"
+        ],
+        "compile": {
+          "lib/Xamarin.iOS10/Esri.ArcGISRuntime.dll": {}
+        },
+        "runtime": {
+          "lib/Xamarin.iOS10/Esri.ArcGISRuntime.dll": {}
+        },
+        "resource": {
+          "lib/Xamarin.iOS10/ar/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ar"
+          },
+          "lib/Xamarin.iOS10/bs/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "bs"
+          },
+          "lib/Xamarin.iOS10/ca/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ca"
+          },
+          "lib/Xamarin.iOS10/cs/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "cs"
+          },
+          "lib/Xamarin.iOS10/da/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "da"
+          },
+          "lib/Xamarin.iOS10/de/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "de"
+          },
+          "lib/Xamarin.iOS10/el/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "el"
+          },
+          "lib/Xamarin.iOS10/es/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "es"
+          },
+          "lib/Xamarin.iOS10/et/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "et"
+          },
+          "lib/Xamarin.iOS10/fi/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "fi"
+          },
+          "lib/Xamarin.iOS10/fr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "fr"
+          },
+          "lib/Xamarin.iOS10/he/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "he"
+          },
+          "lib/Xamarin.iOS10/hi/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "hi"
+          },
+          "lib/Xamarin.iOS10/hr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "hr"
+          },
+          "lib/Xamarin.iOS10/hu/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "hu"
+          },
+          "lib/Xamarin.iOS10/id/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "id"
+          },
+          "lib/Xamarin.iOS10/it/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "it"
+          },
+          "lib/Xamarin.iOS10/ja/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ja"
+          },
+          "lib/Xamarin.iOS10/ko/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ko"
+          },
+          "lib/Xamarin.iOS10/lt/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "lt"
+          },
+          "lib/Xamarin.iOS10/lv/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "lv"
+          },
+          "lib/Xamarin.iOS10/nb-NO/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "nb-NO"
+          },
+          "lib/Xamarin.iOS10/nl/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "nl"
+          },
+          "lib/Xamarin.iOS10/no/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "no"
+          },
+          "lib/Xamarin.iOS10/pl/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "pl"
+          },
+          "lib/Xamarin.iOS10/pt-BR/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "pt-BR"
+          },
+          "lib/Xamarin.iOS10/pt-PT/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "pt-PT"
+          },
+          "lib/Xamarin.iOS10/ro/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ro"
+          },
+          "lib/Xamarin.iOS10/ru/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ru"
+          },
+          "lib/Xamarin.iOS10/sl/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "sl"
+          },
+          "lib/Xamarin.iOS10/sr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "sr"
+          },
+          "lib/Xamarin.iOS10/sv/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "sv"
+          },
+          "lib/Xamarin.iOS10/th/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "th"
+          },
+          "lib/Xamarin.iOS10/tr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "tr"
+          },
+          "lib/Xamarin.iOS10/uk/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "uk"
+          },
+          "lib/Xamarin.iOS10/vi/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "vi"
+          },
+          "lib/Xamarin.iOS10/zh-CN/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-CN"
+          },
+          "lib/Xamarin.iOS10/zh-HK/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-HK"
+          },
+          "lib/Xamarin.iOS10/zh-Hans/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-Hans"
+          },
+          "lib/Xamarin.iOS10/zh-TW/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-TW"
+          }
+        },
+        "build": {
+          "buildTransitive/Xamarin.iOS10/Esri.ArcGISRuntime.Xamarin.iOS.targets": {}
+        }
+      },
+      "System.Numerics.Vectors/4.5.0": {
+        "type": "package",
+        "compile": {
+          "ref/xamarinios10/_._": {}
+        },
+        "runtime": {
+          "lib/xamarinios10/_._": {}
+        }
+      },
+      "Xamarin.Essentials/1.3.1": {
+        "type": "package",
+        "dependencies": {
+          "System.Numerics.Vectors": "4.5.0"
+        },
+        "frameworkAssemblies": [
+          "OpenTK-1.0"
+        ],
+        "compile": {
+          "lib/xamarinios10/Xamarin.Essentials.dll": {}
+        },
+        "runtime": {
+          "lib/xamarinios10/Xamarin.Essentials.dll": {}
+        }
+      }
+    },
+    "Xamarin.iOS,Version=v1.0/win-x64": {
+      "Esri.ArcGISRuntime.ARToolkit/100.7.0": {
+        "type": "package",
+        "dependencies": {
+          "Esri.ArcGISRuntime.Xamarin.iOS": "100.7.0"
+        },
+        "frameworkAssemblies": [
+          "System.Drawing.Common.dll"
+        ],
+        "compile": {
+          "lib/xamarinios10/Esri.ArcGISRuntime.ARToolkit.dll": {}
+        },
+        "runtime": {
+          "lib/xamarinios10/Esri.ArcGISRuntime.ARToolkit.dll": {}
+        }
+      },
+      "Esri.ArcGISRuntime.Xamarin.iOS/100.7.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "OpenTK-1.0",
+          "Xamarin.iOS"
+        ],
+        "compile": {
+          "lib/Xamarin.iOS10/Esri.ArcGISRuntime.dll": {}
+        },
+        "runtime": {
+          "lib/Xamarin.iOS10/Esri.ArcGISRuntime.dll": {}
+        },
+        "resource": {
+          "lib/Xamarin.iOS10/ar/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ar"
+          },
+          "lib/Xamarin.iOS10/bs/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "bs"
+          },
+          "lib/Xamarin.iOS10/ca/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ca"
+          },
+          "lib/Xamarin.iOS10/cs/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "cs"
+          },
+          "lib/Xamarin.iOS10/da/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "da"
+          },
+          "lib/Xamarin.iOS10/de/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "de"
+          },
+          "lib/Xamarin.iOS10/el/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "el"
+          },
+          "lib/Xamarin.iOS10/es/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "es"
+          },
+          "lib/Xamarin.iOS10/et/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "et"
+          },
+          "lib/Xamarin.iOS10/fi/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "fi"
+          },
+          "lib/Xamarin.iOS10/fr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "fr"
+          },
+          "lib/Xamarin.iOS10/he/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "he"
+          },
+          "lib/Xamarin.iOS10/hi/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "hi"
+          },
+          "lib/Xamarin.iOS10/hr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "hr"
+          },
+          "lib/Xamarin.iOS10/hu/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "hu"
+          },
+          "lib/Xamarin.iOS10/id/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "id"
+          },
+          "lib/Xamarin.iOS10/it/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "it"
+          },
+          "lib/Xamarin.iOS10/ja/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ja"
+          },
+          "lib/Xamarin.iOS10/ko/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ko"
+          },
+          "lib/Xamarin.iOS10/lt/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "lt"
+          },
+          "lib/Xamarin.iOS10/lv/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "lv"
+          },
+          "lib/Xamarin.iOS10/nb-NO/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "nb-NO"
+          },
+          "lib/Xamarin.iOS10/nl/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "nl"
+          },
+          "lib/Xamarin.iOS10/no/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "no"
+          },
+          "lib/Xamarin.iOS10/pl/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "pl"
+          },
+          "lib/Xamarin.iOS10/pt-BR/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "pt-BR"
+          },
+          "lib/Xamarin.iOS10/pt-PT/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "pt-PT"
+          },
+          "lib/Xamarin.iOS10/ro/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ro"
+          },
+          "lib/Xamarin.iOS10/ru/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ru"
+          },
+          "lib/Xamarin.iOS10/sl/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "sl"
+          },
+          "lib/Xamarin.iOS10/sr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "sr"
+          },
+          "lib/Xamarin.iOS10/sv/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "sv"
+          },
+          "lib/Xamarin.iOS10/th/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "th"
+          },
+          "lib/Xamarin.iOS10/tr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "tr"
+          },
+          "lib/Xamarin.iOS10/uk/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "uk"
+          },
+          "lib/Xamarin.iOS10/vi/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "vi"
+          },
+          "lib/Xamarin.iOS10/zh-CN/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-CN"
+          },
+          "lib/Xamarin.iOS10/zh-HK/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-HK"
+          },
+          "lib/Xamarin.iOS10/zh-Hans/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-Hans"
+          },
+          "lib/Xamarin.iOS10/zh-TW/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-TW"
+          }
+        },
+        "build": {
+          "buildTransitive/Xamarin.iOS10/Esri.ArcGISRuntime.Xamarin.iOS.targets": {}
+        }
+      },
+      "System.Numerics.Vectors/4.5.0": {
+        "type": "package",
+        "compile": {
+          "ref/xamarinios10/_._": {}
+        },
+        "runtime": {
+          "lib/xamarinios10/_._": {}
+        }
+      },
+      "Xamarin.Essentials/1.3.1": {
+        "type": "package",
+        "dependencies": {
+          "System.Numerics.Vectors": "4.5.0"
+        },
+        "frameworkAssemblies": [
+          "OpenTK-1.0"
+        ],
+        "compile": {
+          "lib/xamarinios10/Xamarin.Essentials.dll": {}
+        },
+        "runtime": {
+          "lib/xamarinios10/Xamarin.Essentials.dll": {}
+        }
+      }
+    },
+    "Xamarin.iOS,Version=v1.0/win-x86": {
+      "Esri.ArcGISRuntime.ARToolkit/100.7.0": {
+        "type": "package",
+        "dependencies": {
+          "Esri.ArcGISRuntime.Xamarin.iOS": "100.7.0"
+        },
+        "frameworkAssemblies": [
+          "System.Drawing.Common.dll"
+        ],
+        "compile": {
+          "lib/xamarinios10/Esri.ArcGISRuntime.ARToolkit.dll": {}
+        },
+        "runtime": {
+          "lib/xamarinios10/Esri.ArcGISRuntime.ARToolkit.dll": {}
+        }
+      },
+      "Esri.ArcGISRuntime.Xamarin.iOS/100.7.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "OpenTK-1.0",
+          "Xamarin.iOS"
+        ],
+        "compile": {
+          "lib/Xamarin.iOS10/Esri.ArcGISRuntime.dll": {}
+        },
+        "runtime": {
+          "lib/Xamarin.iOS10/Esri.ArcGISRuntime.dll": {}
+        },
+        "resource": {
+          "lib/Xamarin.iOS10/ar/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ar"
+          },
+          "lib/Xamarin.iOS10/bs/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "bs"
+          },
+          "lib/Xamarin.iOS10/ca/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ca"
+          },
+          "lib/Xamarin.iOS10/cs/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "cs"
+          },
+          "lib/Xamarin.iOS10/da/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "da"
+          },
+          "lib/Xamarin.iOS10/de/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "de"
+          },
+          "lib/Xamarin.iOS10/el/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "el"
+          },
+          "lib/Xamarin.iOS10/es/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "es"
+          },
+          "lib/Xamarin.iOS10/et/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "et"
+          },
+          "lib/Xamarin.iOS10/fi/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "fi"
+          },
+          "lib/Xamarin.iOS10/fr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "fr"
+          },
+          "lib/Xamarin.iOS10/he/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "he"
+          },
+          "lib/Xamarin.iOS10/hi/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "hi"
+          },
+          "lib/Xamarin.iOS10/hr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "hr"
+          },
+          "lib/Xamarin.iOS10/hu/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "hu"
+          },
+          "lib/Xamarin.iOS10/id/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "id"
+          },
+          "lib/Xamarin.iOS10/it/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "it"
+          },
+          "lib/Xamarin.iOS10/ja/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ja"
+          },
+          "lib/Xamarin.iOS10/ko/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ko"
+          },
+          "lib/Xamarin.iOS10/lt/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "lt"
+          },
+          "lib/Xamarin.iOS10/lv/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "lv"
+          },
+          "lib/Xamarin.iOS10/nb-NO/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "nb-NO"
+          },
+          "lib/Xamarin.iOS10/nl/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "nl"
+          },
+          "lib/Xamarin.iOS10/no/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "no"
+          },
+          "lib/Xamarin.iOS10/pl/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "pl"
+          },
+          "lib/Xamarin.iOS10/pt-BR/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "pt-BR"
+          },
+          "lib/Xamarin.iOS10/pt-PT/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "pt-PT"
+          },
+          "lib/Xamarin.iOS10/ro/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ro"
+          },
+          "lib/Xamarin.iOS10/ru/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "ru"
+          },
+          "lib/Xamarin.iOS10/sl/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "sl"
+          },
+          "lib/Xamarin.iOS10/sr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "sr"
+          },
+          "lib/Xamarin.iOS10/sv/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "sv"
+          },
+          "lib/Xamarin.iOS10/th/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "th"
+          },
+          "lib/Xamarin.iOS10/tr/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "tr"
+          },
+          "lib/Xamarin.iOS10/uk/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "uk"
+          },
+          "lib/Xamarin.iOS10/vi/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "vi"
+          },
+          "lib/Xamarin.iOS10/zh-CN/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-CN"
+          },
+          "lib/Xamarin.iOS10/zh-HK/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-HK"
+          },
+          "lib/Xamarin.iOS10/zh-Hans/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-Hans"
+          },
+          "lib/Xamarin.iOS10/zh-TW/Esri.ArcGISRuntime.resources.dll": {
+            "locale": "zh-TW"
+          }
+        },
+        "build": {
+          "buildTransitive/Xamarin.iOS10/Esri.ArcGISRuntime.Xamarin.iOS.targets": {}
+        }
+      },
+      "System.Numerics.Vectors/4.5.0": {
+        "type": "package",
+        "compile": {
+          "ref/xamarinios10/_._": {}
+        },
+        "runtime": {
+          "lib/xamarinios10/_._": {}
+        }
+      },
+      "Xamarin.Essentials/1.3.1": {
+        "type": "package",
+        "dependencies": {
+          "System.Numerics.Vectors": "4.5.0"
+        },
+        "frameworkAssemblies": [
+          "OpenTK-1.0"
+        ],
+        "compile": {
+          "lib/xamarinios10/Xamarin.Essentials.dll": {}
+        },
+        "runtime": {
+          "lib/xamarinios10/Xamarin.Essentials.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Esri.ArcGISRuntime.ARToolkit/100.7.0": {
+      "sha512": "J3/purV78cNjZ1vCDZylhiqkqAC2JYSpHMcPtKJGC0ffoPFgCsic0QKPuvB9ZrqTg0Scxrb01Oy041SgY8w53w==",
+      "type": "package",
+      "path": "esri.arcgisruntime.artoolkit/100.7.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "esri.arcgisruntime.artoolkit.100.7.0.nupkg.sha512",
+        "esri.arcgisruntime.artoolkit.nuspec",
+        "icon.png",
+        "lib/monoandroid81/Esri.ArcGISRuntime.ARToolkit.dll",
+        "lib/monoandroid81/Esri.ArcGISRuntime.ARToolkit.pdb",
+        "lib/monoandroid81/Esri.ArcGISRuntime.ARToolkit.xml",
+        "lib/netstandard2.0/Esri.ArcGISRuntime.ARToolkit.dll",
+        "lib/netstandard2.0/Esri.ArcGISRuntime.ARToolkit.pdb",
+        "lib/netstandard2.0/Esri.ArcGISRuntime.ARToolkit.xml",
+        "lib/xamarinios10/Esri.ArcGISRuntime.ARToolkit.dll",
+        "lib/xamarinios10/Esri.ArcGISRuntime.ARToolkit.pdb",
+        "lib/xamarinios10/Esri.ArcGISRuntime.ARToolkit.xml"
+      ]
+    },
+    "Esri.ArcGISRuntime.Xamarin.iOS/100.7.0": {
+      "sha512": "NNHqTjLcK9SOuMEWPvsQceGUrXkk2AdpwD0+9Cko6EkQ8xwKfXbM0jBt9PBVdJzT3dgTvGBsS1MWhzh/7tp7lA==",
+      "type": "package",
+      "path": "esri.arcgisruntime.xamarin.ios/100.7.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/Xamarin.iOS10/Esri.ArcGISRuntime.Xamarin.iOS.targets",
+        "buildTransitive/Xamarin.iOS10/Esri.ArcGISRuntime.Xamarin.iOS.targets",
+        "esri.arcgisruntime.xamarin.ios.100.7.0.nupkg.sha512",
+        "esri.arcgisruntime.xamarin.ios.nuspec",
+        "framework/ArcGIS-arm64.framework/ArcGIS-arm64",
+        "framework/ArcGIS-arm64.framework/Info.plist",
+        "framework/ArcGIS-sim64.framework/ArcGIS-sim64",
+        "framework/ArcGIS-sim64.framework/Info.plist",
+        "framework/ArcGIS-sim64.framework/_CodeSignature/CodeResources",
+        "icon.png",
+        "legal/Copyright_and_Trademarks.pdf",
+        "legal/EULA.txt",
+        "legal/open-source-acknowledgements.pdf",
+        "lib/Xamarin.iOS10/Esri.ArcGISRuntime.dll",
+        "lib/Xamarin.iOS10/Esri.ArcGISRuntime.xml",
+        "lib/Xamarin.iOS10/ar/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/bs/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/ca/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/cs/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/da/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/de/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/el/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/es/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/et/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/fi/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/fr/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/he/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/hi/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/hr/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/hu/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/id/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/it/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/ja/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/ko/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/lt/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/lv/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/nb-NO/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/nl/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/no/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/pl/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/pt-BR/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/pt-PT/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/ro/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/ru/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/sl/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/sr/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/sv/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/th/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/tr/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/uk/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/vi/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/zh-CN/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/zh-HK/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/zh-Hans/Esri.ArcGISRuntime.resources.dll",
+        "lib/Xamarin.iOS10/zh-TW/Esri.ArcGISRuntime.resources.dll"
+      ]
+    },
+    "System.Numerics.Vectors/4.5.0": {
+      "sha512": "QQTlPTl06J/iiDbJCiepZ4H//BVraReU4O4EoRw1U02H5TLUIT7xn3GnDp9AXPSlJUDyFs4uWjWafNX6WrAojQ==",
+      "type": "package",
+      "path": "system.numerics.vectors/4.5.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net46/System.Numerics.Vectors.dll",
+        "lib/net46/System.Numerics.Vectors.xml",
+        "lib/netcoreapp2.0/_._",
+        "lib/netstandard1.0/System.Numerics.Vectors.dll",
+        "lib/netstandard1.0/System.Numerics.Vectors.xml",
+        "lib/netstandard2.0/System.Numerics.Vectors.dll",
+        "lib/netstandard2.0/System.Numerics.Vectors.xml",
+        "lib/portable-net45+win8+wp8+wpa81/System.Numerics.Vectors.dll",
+        "lib/portable-net45+win8+wp8+wpa81/System.Numerics.Vectors.xml",
+        "lib/uap10.0.16299/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net45/System.Numerics.Vectors.dll",
+        "ref/net45/System.Numerics.Vectors.xml",
+        "ref/net46/System.Numerics.Vectors.dll",
+        "ref/net46/System.Numerics.Vectors.xml",
+        "ref/netcoreapp2.0/_._",
+        "ref/netstandard1.0/System.Numerics.Vectors.dll",
+        "ref/netstandard1.0/System.Numerics.Vectors.xml",
+        "ref/netstandard2.0/System.Numerics.Vectors.dll",
+        "ref/netstandard2.0/System.Numerics.Vectors.xml",
+        "ref/uap10.0.16299/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "system.numerics.vectors.4.5.0.nupkg.sha512",
+        "system.numerics.vectors.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
+    "Xamarin.Essentials/1.3.1": {
+      "sha512": "+51728AdZ/qtABGvcIaNXgEoL2jAtxAXLHS8PvGCP0pb6n7twBqYpfgkmwHYVgu+U99szgtL+Jot8L+OXorPcA==",
+      "type": "package",
+      "path": "xamarin.essentials/1.3.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/monoandroid60/Xamarin.Essentials.dll",
+        "lib/monoandroid60/Xamarin.Essentials.pdb",
+        "lib/monoandroid60/Xamarin.Essentials.xml",
+        "lib/monoandroid70/Xamarin.Essentials.dll",
+        "lib/monoandroid70/Xamarin.Essentials.pdb",
+        "lib/monoandroid70/Xamarin.Essentials.xml",
+        "lib/monoandroid71/Xamarin.Essentials.dll",
+        "lib/monoandroid71/Xamarin.Essentials.pdb",
+        "lib/monoandroid71/Xamarin.Essentials.xml",
+        "lib/monoandroid80/Xamarin.Essentials.dll",
+        "lib/monoandroid80/Xamarin.Essentials.pdb",
+        "lib/monoandroid80/Xamarin.Essentials.xml",
+        "lib/monoandroid81/Xamarin.Essentials.dll",
+        "lib/monoandroid81/Xamarin.Essentials.pdb",
+        "lib/monoandroid81/Xamarin.Essentials.xml",
+        "lib/monoandroid90/Xamarin.Essentials.dll",
+        "lib/monoandroid90/Xamarin.Essentials.pdb",
+        "lib/monoandroid90/Xamarin.Essentials.xml",
+        "lib/netstandard1.0/Xamarin.Essentials.dll",
+        "lib/netstandard1.0/Xamarin.Essentials.pdb",
+        "lib/netstandard1.0/Xamarin.Essentials.xml",
+        "lib/netstandard2.0/Xamarin.Essentials.dll",
+        "lib/netstandard2.0/Xamarin.Essentials.pdb",
+        "lib/netstandard2.0/Xamarin.Essentials.xml",
+        "lib/tizen40/Xamarin.Essentials.dll",
+        "lib/tizen40/Xamarin.Essentials.pdb",
+        "lib/tizen40/Xamarin.Essentials.xml",
+        "lib/uap10.0.16299/Xamarin.Essentials.dll",
+        "lib/uap10.0.16299/Xamarin.Essentials.pdb",
+        "lib/uap10.0.16299/Xamarin.Essentials.pri",
+        "lib/uap10.0.16299/Xamarin.Essentials.xml",
+        "lib/xamarinios10/Xamarin.Essentials.dll",
+        "lib/xamarinios10/Xamarin.Essentials.pdb",
+        "lib/xamarinios10/Xamarin.Essentials.xml",
+        "lib/xamarintvos10/Xamarin.Essentials.dll",
+        "lib/xamarintvos10/Xamarin.Essentials.pdb",
+        "lib/xamarintvos10/Xamarin.Essentials.xml",
+        "lib/xamarinwatchos10/Xamarin.Essentials.dll",
+        "lib/xamarinwatchos10/Xamarin.Essentials.pdb",
+        "lib/xamarinwatchos10/Xamarin.Essentials.xml",
+        "readme.txt",
+        "xamarin.essentials.1.3.1.nupkg.sha512",
+        "xamarin.essentials.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "Xamarin.iOS,Version=v1.0": [
+      "Esri.ArcGISRuntime.ARToolkit >= 100.7.0",
+      "Xamarin.Essentials >= 1.3.1"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\matt9678\\.nuget\\packages\\": {},
+    "C:\\Microsoft\\Xamarin\\NuGet\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj",
+      "projectName": "PlaneARViewer",
+      "projectPath": "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj",
+      "packagesPath": "C:\\Users\\matt9678\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\obj\\",
+      "projectStyle": "PackageReference",
+      "skipContentFileWrite": true,
+      "fallbackFolders": [
+        "C:\\Microsoft\\Xamarin\\NuGet\\"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\matt9678\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "xamarinios10"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Users\\matt9678\\AppData\\Local\\Esri\\NuGet": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "xamarinios10": {
+          "projectReferences": {}
+        }
+      }
+    },
+    "frameworks": {
+      "xamarinios10": {
+        "dependencies": {
+          "Esri.ArcGISRuntime.ARToolkit": {
+            "target": "Package",
+            "version": "[100.7.0, )"
+          },
+          "Xamarin.Essentials": {
+            "target": "Package",
+            "version": "[1.3.1, )"
+          }
+        }
+      }
+    },
+    "runtimes": {
+      "win": {
+        "#import": []
+      },
+      "win-x64": {
+        "#import": []
+      },
+      "win-x86": {
+        "#import": []
+      }
+    }
+  }
+}
