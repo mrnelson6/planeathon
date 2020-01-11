@@ -40,5 +40,7 @@
 	<string>For showing the current location in a map</string>
 	<key>NSCameraUsageDescription</key>
 	<string>For Augmented Reality</string>
+	<key>CFBundleName</key>
+	<string>PlaneARViewer</string>
 </dict>
 </plist>

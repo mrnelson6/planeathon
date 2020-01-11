@@ -75,70 +75,71 @@ namespace PlaneARViewer
 
         private async void Initialize()
         {
-            // Create and add the scene.
-            _arView.Scene = new Scene(Basemap.CreateImageryWithLabels());
-
-            // Add the location data source to the AR view.
-            _arView.LocationDataSource = _locationSource;
-
-            // Create and add the elevation source.
-            _elevationSource = new ArcGISTiledElevationSource(new Uri("https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer"));
-            _elevationSurface = new Surface();
-            _elevationSurface.ElevationSources.Add(_elevationSource);
-            _arView.Scene.BaseSurface = _elevationSurface;
-
-            // Configure the surface for AR: no navigation constraint and hidden by default.
-            _elevationSurface.NavigationConstraint = NavigationConstraint.None;
-            _elevationSurface.Opacity = 0;
-
-            // Configure scene view display for real-scale AR: no space effect or atmosphere effect.
-            _arView.SpaceEffect = SpaceEffect.None;
-            _arView.AtmosphereEffect = AtmosphereEffect.None;
-
-            _arView.Scene.BaseSurface.Opacity = 0.5;
-
-            sr = new SpatialReference(4326);
-            String modelPath = GetModelPath();
-            plane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(modelPath), 50.0);
-
-            _graphicsOverlay = new GraphicsOverlay();
-            _graphicsOverlay.SceneProperties.SurfacePlacement = SurfacePlacement.Absolute;
-            _arView.GraphicsOverlays.Add(_graphicsOverlay);
-            SimpleRenderer renderer3D = new SimpleRenderer();
-            RendererSceneProperties renderProperties = renderer3D.SceneProperties;
-            // Use expressions to keep the renderer properties updated as parameters of the rendered object
-            renderProperties.HeadingExpression = "[HEADING]";
-            renderProperties.PitchExpression = "[PITCH]";
-            renderProperties.RollExpression = "[ROLL]";
-            // Apply the renderer to the scene view's overlay
-            _graphicsOverlay.Renderer = renderer3D;
-
-
-            MapPoint mp = new MapPoint(-117.18, 33.5556, 10000, sr);
-            Camera cm = new Camera(mp, 0, 90, 0);
-
-            _arView.SetViewpointCamera(cm);
-
-
-            queryPlanes();
-
-
-            _animationTimer = new Timer(1000)
+            try
             {
-                Enabled = true,
-                AutoReset = true
-            };
+                // Create and add the scene.
+                _arView.Scene = new Scene(Basemap.CreateImageryWithLabels());
 
-            // Move the plane every time the timer expires
-            _animationTimer.Elapsed += AnimatePlane;
+                // Add the location data source to the AR view.
+                _arView.LocationDataSource = _locationSource;
 
-            _animationTimer.Start();
+                // Create and add the elevation source.
+                _elevationSource = new ArcGISTiledElevationSource(new Uri("https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer"));
+                _elevationSurface = new Surface();
+                _elevationSurface.ElevationSources.Add(_elevationSource);
+                _arView.Scene.BaseSurface = _elevationSurface;
 
-            // Disable scene interaction.
-            _arView.InteractionOptions = new SceneViewInteractionOptions() { IsEnabled = false };
+                // Configure the surface for AR: no navigation constraint and hidden by default.
+                _elevationSurface.NavigationConstraint = NavigationConstraint.None;
+                _elevationSurface.Opacity = 0;
 
-            // Get the elevation value.
-            _arView.LocationDataSource.LocationChanged += UpdateElevation;
+                // Configure scene view display for real-scale AR: no space effect or atmosphere effect.
+                _arView.SpaceEffect = SpaceEffect.None;
+                _arView.AtmosphereEffect = AtmosphereEffect.None;
+
+                _arView.Scene.BaseSurface.Opacity = 0.5;
+
+                sr = SpatialReferences.Wgs84;
+
+                String modelPath = GetModelPath();
+                plane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(modelPath), 50.0);
+
+                _graphicsOverlay = new GraphicsOverlay();
+                _graphicsOverlay.SceneProperties.SurfacePlacement = SurfacePlacement.Absolute;
+                _arView.GraphicsOverlays.Add(_graphicsOverlay);
+                SimpleRenderer renderer3D = new SimpleRenderer();
+                RendererSceneProperties renderProperties = renderer3D.SceneProperties;
+                // Use expressions to keep the renderer properties updated as parameters of the rendered object
+                renderProperties.HeadingExpression = "[HEADING]";
+                renderProperties.PitchExpression = "[PITCH]";
+                renderProperties.RollExpression = "[ROLL]";
+                // Apply the renderer to the scene view's overlay
+                _graphicsOverlay.Renderer = renderer3D;
+
+                queryPlanes();
+
+
+                _animationTimer = new Timer(1000)
+                {
+                    Enabled = true,
+                    AutoReset = true
+                };
+
+                // Move the plane every time the timer expires
+                _animationTimer.Elapsed += AnimatePlane;
+
+                _animationTimer.Start();
+
+                // Disable scene interaction.
+                _arView.InteractionOptions = new SceneViewInteractionOptions() { IsEnabled = false };
+
+                // Get the elevation value.
+                _arView.LocationDataSource.LocationChanged += UpdateElevation;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
 
         private async void UpdateElevation(object sender, Location e)
@@ -218,71 +219,77 @@ namespace PlaneARViewer
 
         private async void queryPlanes()
         {
-            int max_planes = 0;
-            // var response = await client.GetAsync("https://matt9678:Window430@opensky-network.org/api/states/all");
-            //var response = await client.GetAsync("https://matt9678:Window430@opensky-network.org/api/states/all?lamin=31.87845&lomin=-119.81135&lamax=34.98221&lomax=-114.54345");
-            var response = await client.GetAsync("https://matt9678:Window430@opensky-network.org/api/states/all?lamin=33.82&lomin=-117.781&lamax=34.616&lomax=-115.712");
-            var responseString = await response.Content.ReadAsStringAsync();
-
-            String states = responseString.Substring(30, responseString.Length - 30);
-            String[] elements = states.Split('[');
-
-            if (max_planes == 0)
+            try
             {
-                max_planes = elements.Length;
-            }
-            for (int i = 0; i < max_planes; i++)
-            {
-                String[] attributes = elements[i].Split(',');
-                if (attributes[5] != "null" || attributes[5] != "null")
+                int max_planes = 0;
+                // var response = await client.GetAsync("https://matt9678:Window430@opensky-network.org/api/states/all");
+                //var response = await client.GetAsync("https://matt9678:Window430@opensky-network.org/api/states/all?lamin=31.87845&lomin=-119.81135&lamax=34.98221&lomax=-114.54345");
+                var response = await client.GetAsync("https://opensky-network.org/api/states/all?lamin=33.82&lomin=-117.781&lamax=34.616&lomax=-115.712");
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                String states = responseString.Substring(30, responseString.Length - 30);
+                String[] elements = states.Split('[');
+
+                if (max_planes == 0)
                 {
-                    String callsign = attributes[1].Substring(1, attributes[1].Length - 2);
-                    double lon = Convert.ToDouble(attributes[5]);
-                    double lat = Convert.ToDouble(attributes[6]);
-                    double alt = 0.0;
-                    if (attributes[13] != "null")
+                    max_planes = elements.Length;
+                }
+                for (int i = 0; i < max_planes; i++)
+                {
+                    String[] attributes = elements[i].Split(',');
+                    if (attributes[5] != "null" || attributes[5] != "null")
                     {
-                        alt = Convert.ToDouble(attributes[13]);
-                    }
-                    else if (attributes[7] != "null")
-                    {
-                        alt = Convert.ToDouble(attributes[7]);
-                    }
+                        String callsign = attributes[1].Substring(1, attributes[1].Length - 2);
+                        double lon = Convert.ToDouble(attributes[5]);
+                        double lat = Convert.ToDouble(attributes[6]);
+                        double alt = 0.0;
+                        if (attributes[13] != "null")
+                        {
+                            alt = Convert.ToDouble(attributes[13]);
+                        }
+                        else if (attributes[7] != "null")
+                        {
+                            alt = Convert.ToDouble(attributes[7]);
+                        }
 
-                    double velocity = 0.0;
-                    double heading = 0.0;
-                    double vert_rate = 0.0;
-                    if (attributes[9] != "null")
-                    {
-                        velocity = Convert.ToDouble(attributes[9]);
-                    }
-                    if (attributes[10] != "null")
-                    {
-                        heading = Convert.ToDouble(attributes[10]);
-                    }
-                    if (attributes[11] != "null")
-                    {
-                        vert_rate = Convert.ToDouble(attributes[11]);
-                    }
-                    Geometry g = new MapPoint(lon, lat, alt, sr);
-                    if (planes.ContainsKey(callsign))
-                    {
-                        Plane currPlane = planes[callsign];
-                        currPlane.graphic.Geometry = g;
-                        currPlane.graphic.Attributes["HEADING"] = heading + 180;
-                        currPlane.velocity = velocity;
-                        currPlane.vert_rate = vert_rate;
-                        currPlane.heading = heading;
-                    }
-                    else
-                    {
-                        Graphic gr = new Graphic(g, plane3DSymbol);
-                        gr.Attributes["HEADING"] = heading + 180;
-                        Plane p = new Plane(gr, velocity, vert_rate, heading);
-                        planes.Add(callsign, p);
-                        _graphicsOverlay.Graphics.Add(gr);
+                        double velocity = 0.0;
+                        double heading = 0.0;
+                        double vert_rate = 0.0;
+                        if (attributes[9] != "null")
+                        {
+                            velocity = Convert.ToDouble(attributes[9]);
+                        }
+                        if (attributes[10] != "null")
+                        {
+                            heading = Convert.ToDouble(attributes[10]);
+                        }
+                        if (attributes[11] != "null")
+                        {
+                            vert_rate = Convert.ToDouble(attributes[11]);
+                        }
+                        Geometry g = new MapPoint(lon, lat, alt, sr);
+                        if (planes.ContainsKey(callsign))
+                        {
+                            Plane currPlane = planes[callsign];
+                            currPlane.graphic.Geometry = g;
+                            currPlane.graphic.Attributes["HEADING"] = heading + 180;
+                            currPlane.velocity = velocity;
+                            currPlane.vert_rate = vert_rate;
+                            currPlane.heading = heading;
+                        }
+                        else
+                        {
+                            Graphic gr = new Graphic(g, plane3DSymbol);
+                            gr.Attributes["HEADING"] = heading + 180;
+                            Plane p = new Plane(gr, velocity, vert_rate, heading);
+                            planes.Add(callsign, p);
+                            _graphicsOverlay.Graphics.Add(gr);
+                        }
                     }
                 }
+            } catch(Exception ex)
+            {
+                Console.WriteLine(ex);
             }
         }
 
@@ -314,7 +321,7 @@ namespace PlaneARViewer
             //DataManager.DownloadDataItem("681d6f7694644709a7c830ec57a2d72b");
             //return DataManager.GetDataFolder("681d6f7694644709a7c830ec57a2d72b", "Bristol.dae");
             DataManager.DownloadDataItem("21274c9a36f445db912c7c31d2eb78b7");
-            return DataManager.GetDataFolder("21274c9a36f445db912c7c31d2eb78b7", "Boeing787\\B_787_8.dae");
+            return DataManager.GetDataFolder("21274c9a36f445db912c7c31d2eb78b7", "Boeing787", "B_787_8.dae");
         }
 
 
