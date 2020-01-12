@@ -69,6 +69,7 @@ namespace Test
             SceneView.SetViewpointCamera(cm);
 
             SharedAirplaneFinder.AirplaneFinder sc = new SharedAirplaneFinder.AirplaneFinder(_graphicsOverlay);
+            sc.center = mp;
             sc.setupScene();
         }
 

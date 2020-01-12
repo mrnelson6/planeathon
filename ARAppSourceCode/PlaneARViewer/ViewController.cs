@@ -93,8 +93,8 @@ namespace PlaneARViewer
                 _graphicsOverlay = new GraphicsOverlay();
                 _arView.GraphicsOverlays.Add(_graphicsOverlay);
                 sc = new SharedAirplaneFinder.AirplaneFinder(_graphicsOverlay);
+                sc.center = _locationSource.LastLocation.Position;
                 sc.setupScene();
-
                 // Disable scene interaction.
                 _arView.InteractionOptions = new SceneViewInteractionOptions() { IsEnabled = false };
 
