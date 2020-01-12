@@ -23,8 +23,23 @@ namespace PlaneARViewer.Calibration
         private double _headingValue;
         private double _manualElevation;
         private bool _useManualElevation = false;
-
-        public bool IgnoreLocationUpdate { get; set; } = false;
+        private bool _ignoreLocationUpdate = false;
+        public bool IgnoreLocationUpdate
+        {
+            get => _ignoreLocationUpdate;
+            set
+            {
+                _ignoreLocationUpdate = value;
+                if (_ignoreLocationUpdate)
+                {
+                    _baseSource.LocationChanged -= _baseSource_LocationChanged;
+                } else
+                {
+                    _baseSource.LocationChanged -= _baseSource_LocationChanged;
+                    _baseSource.LocationChanged += _baseSource_LocationChanged;
+                }
+            }
+        }
 
         public double AltitudeOffset
         {
@@ -110,6 +125,7 @@ namespace PlaneARViewer.Calibration
         {
             _useManualElevation = true;
             _manualElevation = elevation;
+            _baseSource_LocationChanged(_baseSource, _lastLocation);
         }
 
         protected override Task OnStartAsync() => _baseSource.StartAsync();

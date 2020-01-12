@@ -40,7 +40,7 @@ namespace SharedAirplaneFinder
         private static readonly HttpClient client = new HttpClient();
 
         // Overlay for testing plane graphics.
-        private GraphicsOverlay _graphicsOverlay;
+        public GraphicsOverlay _graphicsOverlay;
         public int updates_per_second = 5;
         public int seconds_per_query = 10;
         public int small_plane_size = 60;
@@ -155,6 +155,7 @@ namespace SharedAirplaneFinder
                             currPlane.graphic.Geometry = ng;
                             currPlane.graphic.IsSelected = true;
                             currPlane.graphic.Attributes["HEADING"] = heading + 180;
+                            currPlane.graphic.Attributes["CALLSIGN"] = callsign;
                             currPlane.velocity = velocity;
                             currPlane.vert_rate = vert_rate;
                             currPlane.heading = heading;
@@ -167,6 +168,7 @@ namespace SharedAirplaneFinder
                             {
                                 Graphic gr = new Graphic(ng, smallPlane3DSymbol);
                                 gr.Attributes["HEADING"] = heading;
+                                gr.Attributes["CALLSIGN"] = callsign;
                                 gr.IsSelected = true;
                                 Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp);
                                 planes.Add(callsign, p);
@@ -176,6 +178,7 @@ namespace SharedAirplaneFinder
                             {
                                 Graphic gr = new Graphic(ng, largePlane3DSymbol);
                                 gr.Attributes["HEADING"] = heading + 180;
+                                gr.Attributes["CALLSIGN"] = callsign;
                                 gr.IsSelected = true;
                                 Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp);
                                 planes.Add(callsign, p);
