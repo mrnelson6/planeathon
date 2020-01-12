@@ -1,24 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj": {}
+    "C:\\Users\\ed9848\\hackathon2020\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj": {
+    "C:\\Users\\ed9848\\hackathon2020\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj",
+        "projectUniqueName": "C:\\Users\\ed9848\\hackathon2020\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj",
         "projectName": "PlaneARViewer",
-        "projectPath": "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj",
-        "packagesPath": "C:\\Users\\matt9678\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\obj\\",
+        "projectPath": "C:\\Users\\ed9848\\hackathon2020\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj",
+        "packagesPath": "C:\\Users\\ed9848\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ed9848\\hackathon2020\\planeathon\\ARAppSourceCode\\PlaneARViewer\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "fallbackFolders": [
           "C:\\Microsoft\\Xamarin\\NuGet\\"
         ],
         "configFilePaths": [
-          "C:\\Users\\matt9678\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ed9848\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
@@ -27,7 +27,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Users\\matt9678\\AppData\\Local\\Esri\\NuGet": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {

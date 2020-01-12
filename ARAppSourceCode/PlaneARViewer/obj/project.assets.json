@@ -741,7 +741,7 @@
       ]
     },
     "Esri.ArcGISRuntime.Xamarin.iOS/100.7.0": {
-      "sha512": "NNHqTjLcK9SOuMEWPvsQceGUrXkk2AdpwD0+9Cko6EkQ8xwKfXbM0jBt9PBVdJzT3dgTvGBsS1MWhzh/7tp7lA==",
+      "sha512": "nYZtAAa36gnk/gtu6p+P0fJF5EXL1BXJC2/2AgKhIM6Kxhy1hjNVc0BZe8vfXG07L2hzor9eNR6F9oDYG7pfOw==",
       "type": "package",
       "path": "esri.arcgisruntime.xamarin.ios/100.7.0",
       "files": [
@@ -911,24 +911,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\matt9678\\.nuget\\packages\\": {},
+    "C:\\Users\\ed9848\\.nuget\\packages\\": {},
     "C:\\Microsoft\\Xamarin\\NuGet\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj",
+      "projectUniqueName": "C:\\Users\\ed9848\\hackathon2020\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj",
       "projectName": "PlaneARViewer",
-      "projectPath": "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj",
-      "packagesPath": "C:\\Users\\matt9678\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\matt9678\\Hackathon2020\\test\\planeathon\\ARAppSourceCode\\PlaneARViewer\\obj\\",
+      "projectPath": "C:\\Users\\ed9848\\hackathon2020\\planeathon\\ARAppSourceCode\\PlaneARViewer\\PlaneARViewer.csproj",
+      "packagesPath": "C:\\Users\\ed9848\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\ed9848\\hackathon2020\\planeathon\\ARAppSourceCode\\PlaneARViewer\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\"
       ],
       "configFilePaths": [
-        "C:\\Users\\matt9678\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\ed9848\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
       ],
@@ -937,7 +937,6 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\matt9678\\AppData\\Local\\Esri\\NuGet": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
