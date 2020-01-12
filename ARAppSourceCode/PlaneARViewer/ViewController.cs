@@ -211,7 +211,30 @@ namespace PlaneARViewer
 
         private async void _arView_GeoViewTapped(object sender, Esri.ArcGISRuntime.UI.Controls.GeoViewInputEventArgs e)
         {
-            var res = await _arView.IdentifyGraphicsOverlayAsync(sc._graphicsOverlay, e.Position, 64, false); 
+            var res = await _arView.IdentifyGraphicsOverlayAsync(sc._graphicsOverlay, e.Position, 64, false);
+            if (res.Graphics.Any())
+            {
+                Console.WriteLine(res.Graphics.First());
+
+                string callsign = res.Graphics.First().Attributes["CALLSIGN"] as string;
+
+                View.AddSubview(_flightInfoVC.View);
+
+                if (TraitCollection.VerticalSizeClass == UIUserInterfaceSizeClass.Regular)
+                {
+                    NSLayoutConstraint.ActivateConstraints(_flightInfoVC_VerticalConstraints);
+                }
+                else
+                {
+                    NSLayoutConstraint.ActivateConstraints(_flightInfoVC_HorizontalConstraints);
+                }
+            }
+            else
+            {
+                NSLayoutConstraint.DeactivateConstraints(_flightInfoVC_HorizontalConstraints);
+                NSLayoutConstraint.DeactivateConstraints(_flightInfoVC_VerticalConstraints);
+                _flightInfoVC.View.RemoveFromSuperview();
+            }
         }
 
         private async void EnableFromPlaneView(Graphic selectedPlane, string callSign)
