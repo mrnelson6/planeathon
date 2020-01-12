@@ -60,8 +60,8 @@ namespace PlaneARViewer
 
         public int updates_per_second = 5;
         public int seconds_per_query = 10;
-        public int small_plane_size = 200;
-        public int large_plane_size = 200;
+        public int small_plane_size = 60;
+        public int large_plane_size = 20;
         public int seconds_per_cleanup = 30;
 
         private PanCompassCalibrationGestureRecognizer _panCalibrator;
@@ -181,25 +181,25 @@ namespace PlaneARViewer
         {
             View = new UIView { BackgroundColor = UIColor.White };
 
-            UIToolbar toolbar = new UIToolbar();
-            toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
+            //UIToolbar toolbar = new UIToolbar();
+            //toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
 
             _arView = new ARSceneView();
             _arView.TranslatesAutoresizingMaskIntoConstraints = false;
 
-            _helpLabel = new UILabel();
-            _helpLabel.TranslatesAutoresizingMaskIntoConstraints = false;
-            _helpLabel.TextAlignment = UITextAlignment.Center;
-            _helpLabel.TextColor = UIColor.White;
-            _helpLabel.BackgroundColor = UIColor.FromWhiteAlpha(0, 0.6f);
-            _helpLabel.Text = "Plane Gang 2020";
+            //_helpLabel = new UILabel();
+            //_helpLabel.TranslatesAutoresizingMaskIntoConstraints = false;
+            //_helpLabel.TextAlignment = UITextAlignment.Center;
+            //_helpLabel.TextColor = UIColor.White;
+            //_helpLabel.BackgroundColor = UIColor.FromWhiteAlpha(0, 0.6f);
+            //_helpLabel.Text = "Plane Gang 2020";
 
-            toolbar.Items = new[]
-            {
-                new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-            };
+            //toolbar.Items = new[]
+            //{
+            //    new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
+            //};
 
-            View.AddSubviews(_arView, toolbar, _helpLabel);
+            View.AddSubviews(_arView);//, toolbar);//, _helpLabel);
 
             NSLayoutConstraint.ActivateConstraints(new[]
             {
@@ -207,13 +207,13 @@ namespace PlaneARViewer
                 _arView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
                 _arView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
                 _arView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
-                toolbar.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
-                toolbar.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
-                toolbar.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor),
-                _helpLabel.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
-                _helpLabel.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
-                _helpLabel.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
-                _helpLabel.HeightAnchor.ConstraintEqualTo(40)
+                //toolbar.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
+                //toolbar.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
+                //toolbar.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor),
+                //_helpLabel.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
+                //_helpLabel.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
+                //_helpLabel.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
+                //_helpLabel.HeightAnchor.ConstraintEqualTo(40)
             });
         }
 
@@ -314,7 +314,7 @@ namespace PlaneARViewer
                         else
                         {
                             
-                            if(true)
+                            if(callsign[0] == 'N')
                             {
                                 Graphic gr = new Graphic(ng, smallPlane3DSymbol);
                                 gr.Attributes["HEADING"] = heading;
@@ -348,14 +348,19 @@ namespace PlaneARViewer
             updateCounter++;
             if(updateCounter % (seconds_per_cleanup * updates_per_second) == 0)
             {
+                List<String> planes_to_remove = new List<String>();
                 Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
                 foreach (var plane in planes)
                 {
-                    if (unixTimestamp - plane.Value.last_update < seconds_per_cleanup)
+                    if (unixTimestamp - plane.Value.last_update > seconds_per_cleanup)
                     {
                         _graphicsOverlay.Graphics.Remove(plane.Value.graphic);
-                        planes.Remove(plane.Key);
+                        planes_to_remove.Add(plane.Key);
                     }
+                }
+                foreach(var callsign in planes_to_remove)
+                {
+                    planes.Remove(callsign);
                 }
             }
             if (updateCounter % (updates_per_second * seconds_per_query) == 0)
