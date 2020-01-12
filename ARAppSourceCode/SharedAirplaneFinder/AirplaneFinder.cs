@@ -1,10 +1,12 @@
 ﻿using Esri.ArcGISRuntime;
+using Esri.ArcGISRuntime.Data;
 using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.UI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,6 +49,9 @@ namespace SharedAirplaneFinder
         public int small_plane_size = 60;
         public int large_plane_size = 20;
         public int seconds_per_cleanup = 30;
+        public double coord_tolerance = 3.0;
+
+        public MapPoint center;
 
         public AirplaneFinder(GraphicsOverlay go)
         {
@@ -74,7 +79,7 @@ namespace SharedAirplaneFinder
             // Apply the renderer to the scene view's overlay
             _graphicsOverlay.Renderer = renderer3D;
 
-            queryPlanes();
+            await queryPlanes();
 
 
             _animationTimer = new Timer(1000 / updates_per_second)
@@ -89,24 +94,34 @@ namespace SharedAirplaneFinder
             _animationTimer.Start();
         }
 
-        public async void queryPlanes()
+        private async Task addPlanesViaAPI()
         {
             try
             {
-                int max_planes = 0;
-                // var response = await client.GetAsync("https://matt9678:Window430@opensky-network.org/api/states/all");
-                var response = await client.GetAsync("https://matt9678:Window430@opensky-network.org/api/states/all?lamin=33.82&lomin=-117.781&lamax=34.616&lomax=-115.712");
+                MapPoint mp;
+                if (center == null)
+                {
+                    mp = new MapPoint(-117.18, 33.5556, sr);
+                }
+                else
+                {
+                    mp = center;
+                }
+                Envelope en = new Envelope(mp, coord_tolerance, coord_tolerance);
+                double xMax = en.XMax;
+                double yMax = en.YMax;
+                double xMin = en.XMin;
+                double yMin = en.YMin;
+
+                string call = "https://matt9678:Window430@opensky-network.org/api/states/all?lamin=" + yMin + "&lomin=" + xMin + "&lamax=" + yMax + "&lomax=" + xMax;
+                var response = await client.GetAsync(call);
                 var responseString = await response.Content.ReadAsStringAsync();
                 Int32 time_message_sent = Convert.ToInt32(responseString.Substring(8, 10));
                 Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
                 String states = responseString.Substring(30, responseString.Length - 30);
                 String[] elements = states.Split('[');
 
-                if (max_planes == 0)
-                {
-                    max_planes = elements.Length;
-                }
-                for (int i = 0; i < max_planes; i++)
+                for (int i = 0; i < elements.Length; i++)
                 {
                     String[] attributes = elements[i].Split(',');
                     if (attributes[5] != "null" || attributes[5] != "null")
@@ -167,7 +182,6 @@ namespace SharedAirplaneFinder
                         }
                         else
                         {
-
                             if (callsign.Length > 0 && callsign[0] == 'N')
                             {
                                 Graphic gr = new Graphic(ng, smallPlane3DSymbol);
@@ -188,7 +202,6 @@ namespace SharedAirplaneFinder
                                 planes.Add(callsign, p);
                                 _graphicsOverlay.Graphics.Add(gr);
                             }
-
                         }
                     }
                 }
@@ -199,8 +212,124 @@ namespace SharedAirplaneFinder
             }
         }
 
+        private async Task queryFeatures()
+        {
+            //
+            ServiceFeatureTable sft = new ServiceFeatureTable(new Uri("https://dev0011356.esri.com/server/rest/services/Hosted/Latest_Flights_1578796112/FeatureServer/0"));
+
+            MapPoint mp;
+            if(center == null)
+            {
+                mp = new MapPoint(-117.18, 33.5556, sr);
+            }
+            else
+            {
+                mp = center;
+            }
+            Envelope en = new Envelope(mp, coord_tolerance, coord_tolerance);
+            QueryParameters qp = new QueryParameters();
+            qp.Geometry = en;
+            string[] outputFields = { "*" };
+            await sft.PopulateFromServiceAsync(qp, false, outputFields);
+            FeatureQueryResult fqr = await sft.QueryFeaturesAsync(qp);
+            bool transfer_limit = fqr.IsTransferLimitExceeded;
+            Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            foreach (var feature in fqr)
+            {
+                var attributes = feature.Attributes;
+                if (attributes["longitude"] != null || attributes["latitude"] != null)
+                {
+                    String callsign = (String)feature.Attributes["callsign"];
+                    Int32 last_timestamp = 0;
+                    double lon = Convert.ToDouble(attributes["longitude"]);
+                    double lat = Convert.ToDouble(attributes["latitude"]);
+                    double alt = 0.0;
+                    if (attributes["geo_altitude"] != null)
+                    {
+                        alt = Convert.ToDouble(attributes["geo_altitude"]);
+                    }
+                    else if (attributes["baro_altitude"] != null)
+                    {
+                        alt = Convert.ToDouble(attributes["baro_altitude"]);
+                    }
+
+                    double velocity = 0.0;
+                    double heading = 0.0;
+                    double vert_rate = 0.0;
+                    if (attributes["velocity"] != null)
+                    {
+                        velocity = Convert.ToDouble(attributes["velocity"]);
+                    }
+                    if (attributes["true_track"] != null)
+                    {
+                        heading = Convert.ToDouble(attributes["true_track"]);
+                    }
+                    if (attributes["vertical_rate"] != null)
+                    {
+                        vert_rate = Convert.ToDouble(attributes["vertical_rate"]);
+                    }
+                    if (attributes["time_position"] != null)
+                    {
+                        last_timestamp = Convert.ToInt32(attributes["time_position"]);
+                    }
+
+                    MapPoint g = new MapPoint(lon, lat, alt, sr);
+                    //Int32 time_difference = unixTimestamp - last_timestamp;
+
+                    //List<MapPoint> lmp = new List<MapPoint>();
+                    //lmp.Add(g);
+                    //IReadOnlyList<MapPoint> new_location = GeometryEngine.MoveGeodetic(lmp, velocity * time_difference, LinearUnits.Meters, heading, AngularUnits.Degrees, GeodeticCurveType.Geodesic);
+                    //double dz = new_location[0].Z + (vert_rate * time_difference);
+                    //MapPoint ng = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
+                    MapPoint ng = g;
+
+                    if (planes.ContainsKey(callsign))
+                    {
+                        Plane currPlane = planes[callsign];
+                        currPlane.graphic.Geometry = ng;
+                        currPlane.graphic.IsSelected = true;
+                        currPlane.graphic.Attributes["HEADING"] = heading + 180;
+                        currPlane.graphic.Attributes["CALLSIGN"] = callsign;
+                        currPlane.velocity = velocity;
+                        currPlane.vert_rate = vert_rate;
+                        currPlane.heading = heading;
+                        currPlane.last_update = last_timestamp;
+                    }
+                    else
+                    {
+                        if (callsign.Length > 0 && callsign[0] == 'N')
+                        {
+                            Graphic gr = new Graphic(ng, smallPlane3DSymbol);
+                            gr.Attributes["HEADING"] = heading;
+                            gr.Attributes["CALLSIGN"] = callsign;
+                            gr.IsSelected = true;
+                            Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp);
+                            planes.Add(callsign, p);
+                            _graphicsOverlay.Graphics.Add(gr);
+                        }
+                        else
+                        {
+                            Graphic gr = new Graphic(ng, largePlane3DSymbol);
+                            gr.Attributes["HEADING"] = heading + 180;
+                            gr.Attributes["CALLSIGN"] = callsign;
+                            gr.IsSelected = true;
+                            Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp);
+                            planes.Add(callsign, p);
+                            _graphicsOverlay.Graphics.Add(gr);
+                        }
+                    }
+                }
+            }
+        }
+
+        public async Task queryPlanes()
+        {
+           // await queryFeatures();
+            await addPlanesViaAPI();
+        }
+
         private int updateCounter = 0;
-        public void AnimatePlane(object sender, ElapsedEventArgs elapsedEventArgs)
+        public async void AnimatePlane(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             updateCounter++;
             if (updateCounter % (seconds_per_cleanup * updates_per_second) == 0)
@@ -222,7 +351,7 @@ namespace SharedAirplaneFinder
             }
             if (updateCounter % (updates_per_second * seconds_per_query) == 0)
             {
-                queryPlanes();
+               await queryPlanes();
             }
             else
             {
