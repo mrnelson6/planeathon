@@ -22,7 +22,7 @@ namespace PlaneARViewer.Calibration
         {
             base.TouchesMoved(touches, evt);
 
-            if (touches.Count == 2 && touches.ElementAt(0) is UITouch firstTouch)
+            if (evt.AllTouches.Count == 2 && touches.ElementAt(0) is UITouch firstTouch)
             {
                 // move the shape
                 nfloat offsetX = firstTouch.PreviousLocationInView(View).X - firstTouch.LocationInView(View).X;

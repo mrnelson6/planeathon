@@ -24,6 +24,8 @@ namespace PlaneARViewer.Calibration
         private double _manualElevation;
         private bool _useManualElevation = false;
 
+        public bool IgnoreLocationUpdate { get; set; } = false;
+
         public double AltitudeOffset
         {
             get => _altitudeOffset;
@@ -63,10 +65,13 @@ namespace PlaneARViewer.Calibration
         {
             _baseSource = new SystemLocationDataSource();
             _baseSource.LocationChanged += _baseSource_LocationChanged;
+            _baseSource.HeadingChanged += _baseSource_HeadingChanged;
         }
 
         private void _baseSource_LocationChanged(object sender, Location e)
         {
+            if (IgnoreLocationUpdate) return;
+
             // Store the last location; used to raise location changed event when only the offset is changed.
             _lastLocation = e;
 
@@ -93,6 +98,7 @@ namespace PlaneARViewer.Calibration
 
         private void _baseSource_HeadingChanged(object sender, double e)
         {
+            _baseSource.HeadingChanged -= _baseSource_HeadingChanged;
             UpdateHeading(e);
         }
 
