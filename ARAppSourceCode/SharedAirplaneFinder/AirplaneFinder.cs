@@ -21,14 +21,16 @@ namespace SharedAirplaneFinder
         public double vert_rate;
         public double heading;
         public Int32 last_update;
+        public bool big_plane;
 
-        public Plane(Graphic p_graphic, double p_velocity, double p_vert_rate, double p_heading, Int32 p_last_update)
+        public Plane(Graphic p_graphic, double p_velocity, double p_vert_rate, double p_heading, Int32 p_last_update, bool p_big_plane)
         {
             graphic = p_graphic;
             velocity = p_velocity;
             vert_rate = p_vert_rate;
             heading = p_heading;
             last_update = p_last_update;
+            big_plane = p_big_plane;
         }
     }
 
@@ -188,7 +190,7 @@ namespace SharedAirplaneFinder
                                 gr.Attributes["HEADING"] = heading;
                                 gr.Attributes["CALLSIGN"] = callsign;
                                 gr.IsSelected = true;
-                                Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp);
+                                Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, false);
                                 planes.Add(callsign, p);
                                 _graphicsOverlay.Graphics.Add(gr);
                             }
@@ -198,7 +200,7 @@ namespace SharedAirplaneFinder
                                 gr.Attributes["HEADING"] = heading + 180;
                                 gr.Attributes["CALLSIGN"] = callsign;
                                 gr.IsSelected = true;
-                                Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp);
+                                Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, true);
                                 planes.Add(callsign, p);
                                 _graphicsOverlay.Graphics.Add(gr);
                             }
@@ -303,7 +305,7 @@ namespace SharedAirplaneFinder
                             gr.Attributes["HEADING"] = heading;
                             gr.Attributes["CALLSIGN"] = callsign;
                             gr.IsSelected = true;
-                            Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp);
+                            Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, false);
                             planes.Add(callsign, p);
                             _graphicsOverlay.Graphics.Add(gr);
                         }
@@ -313,7 +315,7 @@ namespace SharedAirplaneFinder
                             gr.Attributes["HEADING"] = heading + 180;
                             gr.Attributes["CALLSIGN"] = callsign;
                             gr.IsSelected = true;
-                            Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp);
+                            Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, true);
                             planes.Add(callsign, p);
                             _graphicsOverlay.Graphics.Add(gr);
                         }
@@ -366,6 +368,10 @@ namespace SharedAirplaneFinder
                         double dz = new_location[0].Z + (plane.Value.vert_rate / updates_per_second);
                         MapPoint ng = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
                         plane.Value.graphic.Geometry = ng;
+                        if(!plane.Value.big_plane)
+                        {
+                            plane.Value.graphic.Attributes["HEADING"] = plane.Value.heading;
+                        }
                         plane.Value.graphic.IsSelected = false;
                     }
                 }
