@@ -61,15 +61,6 @@ namespace PlaneARViewer
 
         private async void Initialize()
         {
-            //Uri serviceUri = new Uri("https//dev0011356.esri.com/server/rest/services/Hosted/Latest_Flights_1578796112/FeatureServer/0");
-            //FeatureLayer planesLayer = new FeatureLayer(serviceUri);
-            //try
-            //{
-            //    await planesLayer.LoadAsync();
-            //}
-            //catch (Exception ex)
-            //{
-            //}
             try
             {
                 // Create and add the scene.
@@ -204,7 +195,6 @@ namespace PlaneARViewer
                     string callsign = res.Graphics.First().Attributes["CALLSIGN"] as string;
 
                     await _arView.StopTrackingAsync();
-                    //NavigationController.PushViewController(new FromPlaneViewController() { CallSign = callsign }, true);
                     //new UIAlertView(callsign, "identified", null, "ok").Show();
                     EnableFromPlaneView(res.Graphics.First(), callsign);
                 }
@@ -221,10 +211,7 @@ namespace PlaneARViewer
             // Store the ground camera position.
             _groundCamera = _arView.OriginCamera;
 
-            await _arView.LocationDataSource.StopAsync();
-
             // switch camera to the position of the plane.
-            //_arView.OriginCamera = new Camera(selectedPlane.Geometry.Extent.GetCenter(), _groundCamera.Heading, _groundCamera.Pitch, _groundCamera.Roll);
             await _arView.StopTrackingAsync();
             _arView.OriginCamera = new Camera(selectedPlane.Geometry.Extent.GetCenter(), _groundCamera.Heading, _groundCamera.Pitch, _groundCamera.Roll);
             await _arView.StartTrackingAsync();
@@ -234,12 +221,13 @@ namespace PlaneARViewer
             _arView.AtmosphereEffect = AtmosphereEffect.Realistic;
             _arView.Scene.BaseSurface.Opacity = 1.0;
 
-            //disable subsurface
+            // Disable subsurface
             _arView.Scene.BaseSurface.NavigationConstraint = NavigationConstraint.StayAbove;
 
+            // Disable plane.
             selectedPlane.IsVisible = false;
 
-            //animation
+            // Start animation timer.
             _animationTimer = new Timer(33)
             {
                 AutoReset = true
@@ -248,10 +236,11 @@ namespace PlaneARViewer
             _animationTimer.Start();
         }
 
-        private async void AnimationTimerElapsed(string callSign)
+        private void AnimationTimerElapsed(string callSign)
         {
-            //_arView.OriginCamera = new Camera(selectedPlane.Geometry.Extent.GetCenter(), _groundCamera.Heading, _groundCamera.Pitch, _groundCamera.Roll);
             _arView.OriginCamera = _arView.OriginCamera.MoveTo(sc.planes[callSign].graphic.Geometry.Extent.GetCenter());
+
+            // Update center point so plane doesnt go out of boundary.
             sc.center = _arView.OriginCamera.Location;
         }
 
@@ -259,6 +248,7 @@ namespace PlaneARViewer
         {
             _animationTimer?.Stop();
             _arView.OriginCamera = _groundCamera;
+
             // Configure scene view display for real-scale AR: no space effect or atmosphere effect.
             _arView.SpaceEffect = SpaceEffect.None;
             _arView.AtmosphereEffect = AtmosphereEffect.None;
