@@ -74,6 +74,8 @@
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
     <Compile Include="Calibration\AdjustableLocationDataSource.cs" />
     <Compile Include="Calibration\PanCompassCalibrator.cs" />
+    <Compile Include="BottomSheet\FlightInfoViewController.cs" />
+    <Compile Include="BottomSheet\FlightInfoViewControllerSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -12,6 +12,7 @@ using System.Timers;
 
 using PlaneARViewer.Calibration;
 using System.Linq;
+using PlaneARViewer.BottomSheet;
 
 namespace PlaneARViewer
 {
@@ -36,6 +37,10 @@ namespace PlaneARViewer
 
         // Overlay for testing plane graphics.
         private GraphicsOverlay _graphicsOverlay;
+
+        private FlightInfoViewController _flightInfoVC;
+        private NSLayoutConstraint[] _flightInfoVC_HorizontalConstraints;
+        private NSLayoutConstraint[] _flightInfoVC_VerticalConstraints;
 
         public ViewController(IntPtr handle) : base(handle)
         {
@@ -156,6 +161,11 @@ namespace PlaneARViewer
             //    new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
             //};
 
+            _flightInfoVC = new FlightInfoViewController();
+
+            AddChildViewController(_flightInfoVC);
+            _flightInfoVC.View.TranslatesAutoresizingMaskIntoConstraints = false;
+
             View.AddSubviews(_arView);//, toolbar);//, _helpLabel);
 
             NSLayoutConstraint.ActivateConstraints(new[]
@@ -172,6 +182,22 @@ namespace PlaneARViewer
                 //_helpLabel.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
                 //_helpLabel.HeightAnchor.ConstraintEqualTo(40)
             });
+
+            _flightInfoVC_HorizontalConstraints = new NSLayoutConstraint[]
+            {
+                _flightInfoVC.View.LeadingAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeadingAnchor),
+                _flightInfoVC.View.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor),
+                _flightInfoVC.View.HeightAnchor.ConstraintEqualTo(_flightInfoVC.GetViewHeight()),
+                _flightInfoVC.View.WidthAnchor.ConstraintEqualTo(320)
+            };
+
+            _flightInfoVC_VerticalConstraints = new NSLayoutConstraint[]
+            {
+                _flightInfoVC.View.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor),
+                _flightInfoVC.View.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
+                _flightInfoVC.View.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
+                _flightInfoVC.View.HeightAnchor.ConstraintEqualTo(_flightInfoVC.GetViewHeight())
+            };
         }
 
         public override async void ViewDidAppear(bool animated)
@@ -186,14 +212,29 @@ namespace PlaneARViewer
 
         private async void _arView_GeoViewTapped(object sender, Esri.ArcGISRuntime.UI.Controls.GeoViewInputEventArgs e)
         {
-            var res = await _arView.IdentifyGraphicsOverlayAsync(sc._graphicsOverlay, e.Position, 30, false);
+            var res = await _arView.IdentifyGraphicsOverlayAsync(sc._graphicsOverlay, e.Position, 64, false);
             if (res.Graphics.Any())
             {
                 Console.WriteLine(res.Graphics.First());
 
                 string callsign = res.Graphics.First().Attributes["CALLSIGN"] as string;
 
-                new UIAlertView(callsign, "identified", null, "ok").Show();
+                View.AddSubview(_flightInfoVC.View);
+
+                if (TraitCollection.VerticalSizeClass == UIUserInterfaceSizeClass.Regular)
+                {
+                    NSLayoutConstraint.ActivateConstraints(_flightInfoVC_VerticalConstraints);
+                }
+                else
+                {
+                    NSLayoutConstraint.ActivateConstraints(_flightInfoVC_HorizontalConstraints);
+                }
+            }
+            else
+            {
+                NSLayoutConstraint.DeactivateConstraints(_flightInfoVC_HorizontalConstraints);
+                NSLayoutConstraint.DeactivateConstraints(_flightInfoVC_VerticalConstraints);
+                _flightInfoVC.View.RemoveFromSuperview();
             }
         }
 
@@ -205,6 +246,26 @@ namespace PlaneARViewer
             await _arView?.StopTrackingAsync();
         }
 
+        public override void TraitCollectionDidChange(UITraitCollection previousTraitCollection)
+        {
+            base.TraitCollectionDidChange(previousTraitCollection);
 
+            if (!View.Subviews.ToList().Contains(_flightInfoVC.View))
+            {
+                return;
+            }
+
+            NSLayoutConstraint.DeactivateConstraints(_flightInfoVC_HorizontalConstraints);
+            NSLayoutConstraint.DeactivateConstraints(_flightInfoVC_VerticalConstraints);
+
+            if (TraitCollection.VerticalSizeClass == UIUserInterfaceSizeClass.Regular)
+            {
+                NSLayoutConstraint.ActivateConstraints(_flightInfoVC_VerticalConstraints);
+            }
+            else
+            {
+                NSLayoutConstraint.ActivateConstraints(_flightInfoVC_HorizontalConstraints);
+            }
+        }
     }
 }
