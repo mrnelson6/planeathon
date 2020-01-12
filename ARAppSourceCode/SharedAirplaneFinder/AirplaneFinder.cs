@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace SharedAirplaneFinder
@@ -55,8 +56,8 @@ namespace SharedAirplaneFinder
         {
             sr = SpatialReferences.Wgs84;
 
-            smallPlane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(GetSmallPlane()), small_plane_size);
-            largePlane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(GetLargePlane()), large_plane_size);
+            smallPlane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(await GetSmallPlane()), small_plane_size);
+            largePlane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(await GetLargePlane()), large_plane_size);
 
 
             _graphicsOverlay.SceneProperties.SurfacePlacement = SurfacePlacement.Absolute;
@@ -232,15 +233,15 @@ namespace SharedAirplaneFinder
             }
         }
 
-        private static string GetSmallPlane()
+        private static async Task<string> GetSmallPlane()
         {
-            DataManager.DownloadDataItem("681d6f7694644709a7c830ec57a2d72b");
+            await DataManager.DownloadDataItem("681d6f7694644709a7c830ec57a2d72b");
             return DataManager.GetDataFolder("681d6f7694644709a7c830ec57a2d72b", "Bristol.dae");
         }
 
-        private static string GetLargePlane()
+        private static async Task<string> GetLargePlane()
         {
-            DataManager.DownloadDataItem("21274c9a36f445db912c7c31d2eb78b7");
+            await DataManager.DownloadDataItem("21274c9a36f445db912c7c31d2eb78b7");
             return DataManager.GetDataFolder("21274c9a36f445db912c7c31d2eb78b7", "Boeing787", "B_787_8.dae");
         }
     }
