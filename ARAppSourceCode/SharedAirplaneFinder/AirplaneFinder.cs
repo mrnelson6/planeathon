@@ -355,16 +355,23 @@ namespace SharedAirplaneFinder
             }
             else
             {
-                foreach (var plane in planes)
+                try
                 {
-                    MapPoint g = (MapPoint)plane.Value.graphic.Geometry;
-                    List<MapPoint> lmp = new List<MapPoint>();
-                    lmp.Add(g);
-                    IReadOnlyList<MapPoint> new_location = GeometryEngine.MoveGeodetic(lmp, plane.Value.velocity / updates_per_second, LinearUnits.Meters, plane.Value.heading, AngularUnits.Degrees, GeodeticCurveType.Geodesic);
-                    double dz = new_location[0].Z + (plane.Value.vert_rate / updates_per_second);
-                    MapPoint ng = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
-                    plane.Value.graphic.Geometry = ng;
-                    plane.Value.graphic.IsSelected = false;
+                    foreach (var plane in planes)
+                    {
+                        MapPoint g = (MapPoint)plane.Value.graphic.Geometry;
+                        List<MapPoint> lmp = new List<MapPoint>();
+                        lmp.Add(g);
+                        IReadOnlyList<MapPoint> new_location = GeometryEngine.MoveGeodetic(lmp, plane.Value.velocity / updates_per_second, LinearUnits.Meters, plane.Value.heading, AngularUnits.Degrees, GeodeticCurveType.Geodesic);
+                        double dz = new_location[0].Z + (plane.Value.vert_rate / updates_per_second);
+                        MapPoint ng = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
+                        plane.Value.graphic.Geometry = ng;
+                        plane.Value.graphic.IsSelected = false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
                 }
             }
         }
