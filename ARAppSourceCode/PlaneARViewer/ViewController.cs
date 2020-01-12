@@ -97,9 +97,13 @@ namespace PlaneARViewer
 
                 // Add the location data source to the AR view.
                 _arView.LocationDataSource = _locationSource;
+                _locationSource.HeadingChanged += _locationSource_HeadingChanged;
+                await _locationSource.StartAsync();
+
 
                 // Create and add the elevation source.
                 _elevationSource = new ArcGISTiledElevationSource(new Uri("https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer"));
+                await _elevationSource.LoadAsync();
                 _elevationSurface = new Surface();
                 _elevationSurface.ElevationSources.Add(_elevationSource);
                 _arView.Scene.BaseSurface = _elevationSurface;
@@ -161,15 +165,24 @@ namespace PlaneARViewer
             }
         }
 
+        private void _locationSource_HeadingChanged(object sender, double e)
+        {
+            // Get the old camera.
+            Camera oldCamera = _arView.OriginCamera;
+
+            // Set the origin camera by rotating the existing camera to the new heading.
+            _arView.OriginCamera = oldCamera.RotateTo(e, oldCamera.Pitch, oldCamera.Roll);
+        }
+
         private async void UpdateElevation(object sender, Location e)
         {
             try
             {
                 await _elevationSurface.LoadAsync();
                 double elevation = await _elevationSurface.GetElevationAsync(e.Position);
-                ((AdjustableLocationDataSource)(_arView.LocationDataSource)).AltitudeOffset = elevation + 5;
-                _arView.LocationDataSource.LocationChanged -= UpdateElevation;
-                _graphicsOverlay.Graphics.Add(new Graphic(new MapPoint(e.Position.X, e.Position.Y, e.Position.Z + 2800, e.Position.SpatialReference)));
+                _locationSource.SetKnownElevation(elevation + 1.8);
+                _locationSource.LocationChanged -= UpdateElevation;
+                _locationSource.IgnoreLocationUpdate = true;
             }
             catch (Exception ex)
             {
@@ -222,7 +235,7 @@ namespace PlaneARViewer
             base.ViewDidAppear(animated);
 
             // Start tracking as soon as the view has been shown.
-            await _arView.StartTrackingAsync(ARLocationTrackingMode.Initial);
+            await _arView.StartTrackingAsync(ARLocationTrackingMode.Continuous);
         }
 
         public override async void ViewDidDisappear(bool animated)
