@@ -8,6 +8,7 @@ using System.Linq;
 using System.Timers;
 using UIKit;
 using PlaneARViewer.BottomSheet;
+using SharedAirplaneFinder;
 
 
 namespace PlaneARViewer
@@ -98,6 +99,7 @@ namespace PlaneARViewer
                 sc = new SharedAirplaneFinder.AirplaneFinder(_graphicsOverlay);
                 sc.center = _locationSource.LastLocation.Position;
                 sc.setupScene();
+                _flightInfoVC.AssociateAirplaneFinder(sc);
                 // Disable scene interaction.
                 _arView.InteractionOptions = new SceneViewInteractionOptions() { IsEnabled = false };
 
@@ -218,15 +220,20 @@ namespace PlaneARViewer
 
                 string callsign = res.Graphics.First().Attributes["CALLSIGN"] as string;
 
-                View.AddSubview(_flightInfoVC.View);
+                if (sc.planes.ContainsKey(callsign)){
+                    Plane targetPlane = sc.planes[callsign];
+                    sc.SelectedPlane = targetPlane;
 
-                if (TraitCollection.VerticalSizeClass == UIUserInterfaceSizeClass.Regular)
-                {
-                    NSLayoutConstraint.ActivateConstraints(_flightInfoVC_VerticalConstraints);
-                }
-                else
-                {
-                    NSLayoutConstraint.ActivateConstraints(_flightInfoVC_HorizontalConstraints);
+                    View.AddSubview(_flightInfoVC.View);
+
+                    if (TraitCollection.VerticalSizeClass == UIUserInterfaceSizeClass.Regular)
+                    {
+                        NSLayoutConstraint.ActivateConstraints(_flightInfoVC_VerticalConstraints);
+                    }
+                    else
+                    {
+                        NSLayoutConstraint.ActivateConstraints(_flightInfoVC_HorizontalConstraints);
+                    }
                 }
             }
             else

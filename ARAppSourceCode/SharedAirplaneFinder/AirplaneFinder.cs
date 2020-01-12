@@ -6,6 +6,7 @@ using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.UI;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -14,16 +15,68 @@ using System.Timers;
 
 namespace SharedAirplaneFinder
 {
-    public class Plane
+    public class Plane : INotifyPropertyChanged
     {
+        private string _callSign;
+        private double _velocity;
+        private double _vertRate;
+        private double _heading;
+
+
+
         public Graphic graphic;
-        public double velocity;
-        public double vert_rate;
-        public double heading;
+        public string callsign
+        {
+            get => _callSign;
+            set
+            {
+                if (_callSign != value)
+                {
+                    _callSign = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(callsign)));
+                }
+            }
+        }
+        public double velocity
+        {
+            get => _velocity;
+            set
+            {
+                if (_velocity != value)
+                {
+                    _velocity = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(velocity)));
+                }
+            }
+        }
+        public double vert_rate
+        {
+            get => _vertRate;
+            set
+            {
+                if (_vertRate != value)
+                {
+                    _vertRate = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(vert_rate)));
+                }
+            }
+        }
+        public double heading
+        {
+            get => _heading;
+            set
+            {
+                if (_heading != value)
+                {
+                    _heading = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(heading)));
+                }
+            }
+        }
         public Int32 last_update;
         public bool big_plane;
 
-        public Plane(Graphic p_graphic, double p_velocity, double p_vert_rate, double p_heading, Int32 p_last_update, bool p_big_plane)
+        public Plane(Graphic p_graphic, double p_velocity, double p_vert_rate, double p_heading, Int32 p_last_update, bool p_big_plane, string callsign)
         {
             graphic = p_graphic;
             velocity = p_velocity;
@@ -31,10 +84,13 @@ namespace SharedAirplaneFinder
             heading = p_heading;
             last_update = p_last_update;
             big_plane = p_big_plane;
+            this.callsign = callsign;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 
-    class AirplaneFinder
+    class AirplaneFinder : INotifyPropertyChanged
     {
         private Timer _animationTimer;
         public Dictionary<String, Plane> planes = new Dictionary<String, Plane>();
@@ -52,6 +108,20 @@ namespace SharedAirplaneFinder
         public int large_plane_size = 20;
         public int seconds_per_cleanup = 30;
         public double coord_tolerance = 0.5;
+
+        private Plane _selectedPlane;
+        public Plane SelectedPlane
+        {
+            get => _selectedPlane;
+            set
+            {
+                if(_selectedPlane != value)
+                {
+                    _selectedPlane = value;
+                    UpdateProperty(nameof(SelectedPlane));
+                }
+            }
+        }
 
         public MapPoint center;
 
@@ -190,7 +260,7 @@ namespace SharedAirplaneFinder
                                 gr.Attributes["HEADING"] = heading;
                                 gr.Attributes["CALLSIGN"] = callsign;
                                 gr.IsSelected = true;
-                                Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, false);
+                                Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, false, callsign);
                                 planes.Add(callsign, p);
                                 _graphicsOverlay.Graphics.Add(gr);
                             }
@@ -200,10 +270,17 @@ namespace SharedAirplaneFinder
                                 gr.Attributes["HEADING"] = heading + 180;
                                 gr.Attributes["CALLSIGN"] = callsign;
                                 gr.IsSelected = true;
-                                Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, true);
+                                Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, true, callsign);
                                 planes.Add(callsign, p);
                                 _graphicsOverlay.Graphics.Add(gr);
                             }
+                        }
+
+                        if (SelectedPlane?.callsign == callsign)
+                        {
+                            SelectedPlane.velocity = velocity;
+                            SelectedPlane.heading = heading;
+                            SelectedPlane.vert_rate = vert_rate;
                         }
                     }
                 }
@@ -305,7 +382,7 @@ namespace SharedAirplaneFinder
                             gr.Attributes["HEADING"] = heading;
                             gr.Attributes["CALLSIGN"] = callsign;
                             gr.IsSelected = true;
-                            Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, false);
+                            Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, false, callsign);
                             planes.Add(callsign, p);
                             _graphicsOverlay.Graphics.Add(gr);
                         }
@@ -315,10 +392,17 @@ namespace SharedAirplaneFinder
                             gr.Attributes["HEADING"] = heading + 180;
                             gr.Attributes["CALLSIGN"] = callsign;
                             gr.IsSelected = true;
-                            Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, true);
+                            Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, true, callsign);
                             planes.Add(callsign, p);
                             _graphicsOverlay.Graphics.Add(gr);
                         }
+                    }
+
+                    if (SelectedPlane?.callsign == callsign)
+                    {
+                        SelectedPlane.velocity = velocity;
+                        SelectedPlane.heading = heading;
+                        SelectedPlane.vert_rate = vert_rate;
                     }
                 }
             }
@@ -331,6 +415,7 @@ namespace SharedAirplaneFinder
         }
 
         private int updateCounter = 0;
+
         public async void AnimatePlane(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             updateCounter++;
@@ -392,6 +477,13 @@ namespace SharedAirplaneFinder
         {
             await DataManager.DownloadDataItem("21274c9a36f445db912c7c31d2eb78b7");
             return DataManager.GetDataFolder("21274c9a36f445db912c7c31d2eb78b7", "Boeing787", "B_787_8.dae");
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void UpdateProperty(string name)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }

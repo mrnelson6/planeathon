@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using Foundation;
+using SharedAirplaneFinder;
 using UIKit;
 
 namespace PlaneARViewer.BottomSheet
@@ -13,6 +15,8 @@ namespace PlaneARViewer.BottomSheet
         private UITableViewCell _aircraftAgeInfo;
 
         private ActionViewCell actionViewCell = new ActionViewCell();
+
+        private Plane _currentPlane;
 
         public FlightInfoViewControllerDataSource() : base()
         {
@@ -34,6 +38,67 @@ namespace PlaneARViewer.BottomSheet
 
             _aircraftAgeInfo.TextLabel.Text = "1 Year 8 Months";
             _aircraftAgeInfo.DetailTextLabel.Text = "Aircraft years in service";
+        }
+
+        public void Update(Plane plane)
+        {
+            InvokeOnMainThread(() =>
+            {
+                if (_currentPlane != null)
+                {
+                    _currentPlane.PropertyChanged -= Plane_PropertyChanged;
+                }
+
+                _currentPlane = plane;
+
+                _currentPlane.PropertyChanged += Plane_PropertyChanged;
+
+                UpdateVelocity(_currentPlane.velocity);
+                UpdateVertRate(plane.vert_rate);
+
+
+                if (plane.big_plane)
+                {
+                    _aircraftModelInfo.TextLabel.Text = "Big Plane";
+                }
+                else
+                {
+                    _aircraftModelInfo.TextLabel.Text = "Lil' Plane";
+                }
+                _flightHeaderViewCell.Update(plane);
+            });
+        }
+
+        private void UpdateVelocity(double newVelocity)
+        {
+            _flightSpeedViewCell.TextLabel.Text = $"{newVelocity} Kilometers per Hour";
+        }
+
+        private void UpdateVertRate(double vertRate)
+        {
+            _flightVerticalSpeedViewCell.TextLabel.Text = $"{Math.Abs(vertRate)} Meters per Second";
+
+            if (vertRate > 0)
+            {
+                _flightVerticalSpeedViewCell.DetailTextLabel.Text = "Rate of descent";
+            }
+            else
+            {
+                _flightVerticalSpeedViewCell.DetailTextLabel.Text = "Rate of ascent";
+            }
+        }
+
+        private void Plane_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(Plane.velocity):
+                    InvokeOnMainThread(() => UpdateVelocity(_currentPlane.velocity));
+                    break;
+                case nameof(Plane.vert_rate):
+                    InvokeOnMainThread(() => UpdateVertRate(_currentPlane.vert_rate));
+                    break;
+            }
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
@@ -89,6 +154,14 @@ namespace PlaneARViewer.BottomSheet
 
         public const int Height = 32 + 28 + 2 * 16;
 
+        public void Update(Plane plane)
+        {
+            _originCodeLabel.Text = "ORG";
+            _destinationLabel.Text = "DST";
+            _originNameView.Text = "Origin Airport";
+            _destinationNameView.Text = "Destination Airport";
+        }
+
         public FlightHeaderViewCell(string origin, string destination) : base()
         {
             _arrowLabel = new UILabel();
@@ -113,14 +186,14 @@ namespace PlaneARViewer.BottomSheet
             _originNameView.TranslatesAutoresizingMaskIntoConstraints = false;
             _originNameView.Text = "Atlanta Intl. Airport";
             _originNameView.TextAlignment = UITextAlignment.Center;
-            _originNameView.Font = _originNameView.Font.WithSize(32);
+            _originNameView.Font = _originNameView.Font.WithSize(18);
             _originNameView.AdjustsFontSizeToFitWidth = true;
 
             _destinationNameView = new UILabel();
             _destinationNameView.TranslatesAutoresizingMaskIntoConstraints = false;
             _destinationNameView.Text = "Ontario, Intl. Airport";
             _destinationNameView.TextAlignment = UITextAlignment.Center;
-            _destinationNameView.Font = _destinationNameView.Font.WithSize(32);
+            _destinationNameView.Font = _destinationNameView.Font.WithSize(18);
             _destinationNameView.AdjustsFontSizeToFitWidth = true;
 
             this.ContentView.AddSubviews(_originCodeLabel, _destinationLabel, _arrowLabel, _originNameView, _destinationNameView);
@@ -156,11 +229,6 @@ namespace PlaneARViewer.BottomSheet
         public FlightSpeedViewCell() : base()
         {
             TextLabel.Text = $"Flight speed: ";
-        }
-
-        public void UpdateValue(int value)
-        {
-            TextLabel.Text = $"Flight speed: {value}";
         }
     }
 
