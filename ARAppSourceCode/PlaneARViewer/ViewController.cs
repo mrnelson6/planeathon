@@ -11,6 +11,7 @@ using System.Net.Http;
 using System.Timers;
 
 using PlaneARViewer.Calibration;
+using System.Linq;
 
 namespace PlaneARViewer
 {
@@ -18,8 +19,8 @@ namespace PlaneARViewer
 
     public partial class ViewController : UIViewController
     {
-    
 
+        SharedAirplaneFinder.AirplaneFinder sc;
         // UI objects.
         private ARSceneView _arView;
         private UILabel _helpLabel;
@@ -90,7 +91,7 @@ namespace PlaneARViewer
                 _arView.Scene.BaseSurface.NavigationConstraint = NavigationConstraint.StayAbove;
                 _graphicsOverlay = new GraphicsOverlay();
                 _arView.GraphicsOverlays.Add(_graphicsOverlay);
-                SharedAirplaneFinder.AirplaneFinder sc = new SharedAirplaneFinder.AirplaneFinder(_graphicsOverlay);
+                sc = new SharedAirplaneFinder.AirplaneFinder(_graphicsOverlay);
                 sc.setupScene();
 
                 // Disable scene interaction.
@@ -179,6 +180,21 @@ namespace PlaneARViewer
 
             // Start tracking as soon as the view has been shown.
             await _arView.StartTrackingAsync(ARLocationTrackingMode.Continuous);
+
+            _arView.GeoViewTapped += _arView_GeoViewTapped;
+        }
+
+        private async void _arView_GeoViewTapped(object sender, Esri.ArcGISRuntime.UI.Controls.GeoViewInputEventArgs e)
+        {
+            var res = await _arView.IdentifyGraphicsOverlayAsync(sc._graphicsOverlay, e.Position, 30, false);
+            if (res.Graphics.Any())
+            {
+                Console.WriteLine(res.Graphics.First());
+
+                string callsign = res.Graphics.First().Attributes["CALLSIGN"] as string;
+
+                new UIAlertView(callsign, "identified", null, "ok").Show();
+            }
         }
 
         public override async void ViewDidDisappear(bool animated)
