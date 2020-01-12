@@ -137,7 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
-    <Folder Include="Calibration\" />
   </ItemGroup>
+  <Import Project="..\SharedAirplaneFinder\SharedAirplaneFinder.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>
