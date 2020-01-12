@@ -20,7 +20,10 @@ namespace PlaneARViewer
         {
             // create a new window instance based on the screen size
             Window = new UIWindow(UIScreen.MainScreen.Bounds);
-            Window.RootViewController = new ViewController();
+
+            var x = new UINavigationController();
+            Window.RootViewController = x;
+            x.PushViewController(new ViewController(), true);
     
             // make the window visible
             Window.MakeKeyAndVisible();
