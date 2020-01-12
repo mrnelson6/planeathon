@@ -124,7 +124,7 @@ namespace PlaneARViewer
             {
                 await _elevationSurface.LoadAsync();
                 double elevation = await _elevationSurface.GetElevationAsync(e.Position);
-                _locationSource.SetKnownElevation(elevation + 1.8);
+                _locationSource.SetKnownElevation(elevation + 5.0);
                 _locationSource.LocationChanged -= UpdateElevation;
                 _locationSource.IgnoreLocationUpdate = true;
             }

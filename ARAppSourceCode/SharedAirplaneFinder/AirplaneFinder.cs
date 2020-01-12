@@ -1,4 +1,5 @@
-﻿using Esri.ArcGISRuntime.Geometry;
+﻿using Esri.ArcGISRuntime;
+using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.UI;
@@ -54,6 +55,9 @@ namespace SharedAirplaneFinder
 
         public async void setupScene()
         {
+            string licenseKey = "runtimelite,1000,rud2672252234,none,D7MFA0PL4P2SPF002031";
+            ArcGISRuntimeEnvironment.SetLicense(licenseKey);
+
             sr = SpatialReferences.Wgs84;
 
             smallPlane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(await GetSmallPlane()), small_plane_size);
@@ -164,7 +168,7 @@ namespace SharedAirplaneFinder
                         else
                         {
 
-                            if (callsign[0] == 'N')
+                            if (callsign.Length > 0 && callsign[0] == 'N')
                             {
                                 Graphic gr = new Graphic(ng, smallPlane3DSymbol);
                                 gr.Attributes["HEADING"] = heading;
