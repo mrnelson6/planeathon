@@ -37,7 +37,7 @@ namespace SharedAirplaneFinder
     class AirplaneFinder
     {
         private Timer _animationTimer;
-        private Dictionary<String, Plane> planes = new Dictionary<String, Plane>();
+        public Dictionary<String, Plane> planes = new Dictionary<String, Plane>();
         private ModelSceneSymbol smallPlane3DSymbol;
         private ModelSceneSymbol largePlane3DSymbol;
         private SpatialReference sr;
@@ -46,12 +46,12 @@ namespace SharedAirplaneFinder
 
         // Overlay for testing plane graphics.
         public GraphicsOverlay _graphicsOverlay;
-        public int updates_per_second = 5;
+        public int updates_per_second = 30;
         public int seconds_per_query = 10;
         public int small_plane_size = 60;
         public int large_plane_size = 20;
         public int seconds_per_cleanup = 30;
-        public double coord_tolerance = 3.0;
+        public double coord_tolerance = 0.5;
 
         public MapPoint center;
 

@@ -1,26 +1,19 @@
 ﻿using Esri.ArcGISRuntime.ARToolkit;
-using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Location;
 using Esri.ArcGISRuntime.Mapping;
-using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.UI;
-using System;
-using System.Collections.Generic;
-using UIKit;
-using System.Net.Http;
-using System.Timers;
-
 using PlaneARViewer.Calibration;
+using System;
 using System.Linq;
+using System.Timers;
+using UIKit;
 
 namespace PlaneARViewer
 {
-
-
     public partial class ViewController : UIViewController
     {
+        private SharedAirplaneFinder.AirplaneFinder sc;
 
-        SharedAirplaneFinder.AirplaneFinder sc;
         // UI objects.
         private ARSceneView _arView;
         private UILabel _helpLabel;
@@ -36,6 +29,13 @@ namespace PlaneARViewer
 
         // Overlay for testing plane graphics.
         private GraphicsOverlay _graphicsOverlay;
+
+        // Using the view from an aircraft.
+        private bool _fromPlaneView;
+        private Camera _groundCamera;
+
+        // Timer control enables stopping and starting frame-by-frame animation.
+        private Timer _animationTimer;
 
         public ViewController(IntPtr handle) : base(handle)
         {
@@ -61,7 +61,15 @@ namespace PlaneARViewer
 
         private async void Initialize()
         {
-            
+            //Uri serviceUri = new Uri("https//dev0011356.esri.com/server/rest/services/Hosted/Latest_Flights_1578796112/FeatureServer/0");
+            //FeatureLayer planesLayer = new FeatureLayer(serviceUri);
+            //try
+            //{
+            //    await planesLayer.LoadAsync();
+            //}
+            //catch (Exception ex)
+            //{
+            //}
             try
             {
                 // Create and add the scene.
@@ -71,7 +79,6 @@ namespace PlaneARViewer
                 _arView.LocationDataSource = _locationSource;
                 _locationSource.HeadingChanged += _locationSource_HeadingChanged;
                 await _locationSource.StartAsync();
-
 
                 // Create and add the elevation source.
                 _elevationSource = new ArcGISTiledElevationSource(new Uri("https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer"));
@@ -104,7 +111,7 @@ namespace PlaneARViewer
                 _panCalibrator = new PanCompassCalibrationGestureRecognizer(_locationSource);
                 View.GestureRecognizers = new[] { _panCalibrator };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex);
             }
@@ -197,15 +204,70 @@ namespace PlaneARViewer
                     string callsign = res.Graphics.First().Attributes["CALLSIGN"] as string;
 
                     await _arView.StopTrackingAsync();
-                    NavigationController.PushViewController(new FromPlaneViewController() { CallSign = callsign }, true);
+                    //NavigationController.PushViewController(new FromPlaneViewController() { CallSign = callsign }, true);
                     //new UIAlertView(callsign, "identified", null, "ok").Show();
+                    EnableFromPlaneView(res.Graphics.First(), callsign);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-
             }
-            
+        }
+
+        private async void EnableFromPlaneView(Graphic selectedPlane, string callSign)
+        {
+            _arView.GeoViewTapped -= _arView_GeoViewTapped;
+
+            // Store the ground camera position.
+            _groundCamera = _arView.OriginCamera;
+
+            await _arView.LocationDataSource.StopAsync();
+
+            // switch camera to the position of the plane.
+            //_arView.OriginCamera = new Camera(selectedPlane.Geometry.Extent.GetCenter(), _groundCamera.Heading, _groundCamera.Pitch, _groundCamera.Roll);
+            await _arView.StopTrackingAsync();
+            _arView.OriginCamera = new Camera(selectedPlane.Geometry.Extent.GetCenter(), _groundCamera.Heading, _groundCamera.Pitch, _groundCamera.Roll);
+            await _arView.StartTrackingAsync();
+
+            // Configure scene view display for real-scale AR: no space effect or atmosphere effect.
+            _arView.SpaceEffect = SpaceEffect.Stars;
+            _arView.AtmosphereEffect = AtmosphereEffect.Realistic;
+            _arView.Scene.BaseSurface.Opacity = 1.0;
+
+            //disable subsurface
+            _arView.Scene.BaseSurface.NavigationConstraint = NavigationConstraint.StayAbove;
+
+            selectedPlane.IsVisible = false;
+
+            //animation
+            _animationTimer = new Timer(33)
+            {
+                AutoReset = true
+            };
+            _animationTimer.Elapsed += (s, e) => AnimationTimerElapsed(callSign);
+            _animationTimer.Start();
+        }
+
+        private async void AnimationTimerElapsed(string callSign)
+        {
+            //_arView.OriginCamera = new Camera(selectedPlane.Geometry.Extent.GetCenter(), _groundCamera.Heading, _groundCamera.Pitch, _groundCamera.Roll);
+            _arView.OriginCamera = _arView.OriginCamera.MoveTo(sc.planes[callSign].graphic.Geometry.Extent.GetCenter());
+            sc.center = _arView.OriginCamera.Location;
+        }
+
+        private void DisableFromPlaneView()
+        {
+            _animationTimer?.Stop();
+            _arView.OriginCamera = _groundCamera;
+            // Configure scene view display for real-scale AR: no space effect or atmosphere effect.
+            _arView.SpaceEffect = SpaceEffect.None;
+            _arView.AtmosphereEffect = AtmosphereEffect.None;
+
+            // Enable subsurface
+            _arView.Scene.BaseSurface.NavigationConstraint = NavigationConstraint.None;
+            _arView.Scene.BaseSurface.Opacity = 0.5;
+
+            _arView.GeoViewTapped += _arView_GeoViewTapped;
         }
 
         public override async void ViewDidDisappear(bool animated)
@@ -215,7 +277,5 @@ namespace PlaneARViewer
             // Stop ARKit tracking and unsubscribe from events when the view closes.
             await _arView?.StopTrackingAsync();
         }
-
-
     }
 }
