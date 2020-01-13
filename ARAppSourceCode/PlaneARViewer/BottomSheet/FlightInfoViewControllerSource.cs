@@ -1,6 +1,7 @@
 ﻿using Foundation;
 using SharedAirplaneFinder;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using UIKit;
 
@@ -8,11 +9,16 @@ namespace PlaneARViewer.BottomSheet
 {
     public class FlightInfoViewControllerDataSource : UITableViewDataSource
     {
-        private FlightHeaderViewCell _flightHeaderViewCell;
-        private UITableViewCell _flightSpeedViewCell;
-        private UITableViewCell _flightVerticalSpeedViewCell;
-        private UITableViewCell _aircraftModelInfo;
-        private UITableViewCell _aircraftAgeInfo;
+        // Header cell
+        // flight status (on time, departure, estimated arrival)
+        // aircraft type & airline
+        // Speed, rate of ascent/descent, altitude
+
+        private ThreePartViewCell _flightHeaderViewCell;
+        private TwoPartViewCell _flightStatusViewCell;
+        private TwoPartViewCell _flightProviderViewCell;
+        private ThreePartViewCell _flightPositionViewCell;
+        private ActionViewCell _actionViewCell;
 
         public ActionViewCell actionViewCell = new ActionViewCell();
 
@@ -20,27 +26,14 @@ namespace PlaneARViewer.BottomSheet
 
         public FlightInfoViewControllerDataSource() : base()
         {
-            _flightHeaderViewCell = new FlightHeaderViewCell("AOC", "PGB");
-
-            _flightSpeedViewCell = new UITableViewCell(UITableViewCellStyle.Subtitle, nameof(_flightSpeedViewCell));
-            _flightVerticalSpeedViewCell = new UITableViewCell(UITableViewCellStyle.Subtitle, nameof(_flightVerticalSpeedViewCell));
-            _aircraftModelInfo = new UITableViewCell(UITableViewCellStyle.Subtitle, nameof(_aircraftModelInfo));
-            _aircraftAgeInfo = new UITableViewCell(UITableViewCellStyle.Subtitle, nameof(_aircraftAgeInfo));
-
-            _flightSpeedViewCell.TextLabel.Text = "120 MPH";
-            _flightSpeedViewCell.DetailTextLabel.Text = "Ground Speed";
-
-            _flightVerticalSpeedViewCell.TextLabel.Text = "6000 feet/minute";
-            _flightVerticalSpeedViewCell.DetailTextLabel.Text = "Rate of descent";
-
-            _aircraftModelInfo.TextLabel.Text = "Boeing 787 MAX 8";
-            _aircraftModelInfo.DetailTextLabel.Text = "Aircraft Make & Model";
-
-            _aircraftAgeInfo.TextLabel.Text = "1 Year 8 Months";
-            _aircraftAgeInfo.DetailTextLabel.Text = "Aircraft years in service";
+            _flightHeaderViewCell = new ThreePartViewCell();
+            _flightStatusViewCell = new TwoPartViewCell();
+            _flightProviderViewCell = new TwoPartViewCell();
+            _flightPositionViewCell = new ThreePartViewCell();
+            _actionViewCell = new ActionViewCell();
         }
 
-        public void Update(Plane plane)
+        public void SetNewPlane(Plane plane)
         {
             InvokeOnMainThread(() =>
             {
@@ -53,195 +46,148 @@ namespace PlaneARViewer.BottomSheet
 
                 _currentPlane.PropertyChanged += Plane_PropertyChanged;
 
-                UpdateVelocity(_currentPlane.velocity);
-                UpdateVertRate(plane.vert_rate);
-
-                if (plane.big_plane)
-                {
-                    _aircraftModelInfo.TextLabel.Text = "Big Plane";
-                }
-                else
-                {
-                    _aircraftModelInfo.TextLabel.Text = "Lil' Plane";
-                }
-                _flightHeaderViewCell.Update(plane);
+                RefreshFromCurrentPlane();
             });
         }
 
-        private void UpdateVelocity(double newVelocity)
+        private void RefreshFromCurrentPlane()
         {
-            _flightSpeedViewCell.TextLabel.Text = $"{newVelocity} Kilometers per Hour";
-        }
-
-        private void UpdateVertRate(double vertRate)
-        {
-            _flightVerticalSpeedViewCell.TextLabel.Text = $"{Math.Abs(vertRate)} Meters per Second";
-
-            if (vertRate > 0)
+            if (DateTime.Now.Second > 30) // flight is on time
             {
-                _flightVerticalSpeedViewCell.DetailTextLabel.Text = "Rate of descent";
+                _flightStatusViewCell.Update(UIColor.SystemGreenColor, "1:23 PM", "Departure Time", "4:53 PM", "Estimated Arrival");
             }
             else
             {
-                _flightVerticalSpeedViewCell.DetailTextLabel.Text = "Rate of ascent";
+                _flightStatusViewCell.Update(UIColor.SystemRedColor, "1:23 PM", "Departure Time", "4:53 PM", "Estimated Arrival");
             }
+
+            _flightProviderViewCell.Update(UIColor.LabelColor, "Boeing 787 MAXXX 8", "Aircraft Model", "United Airlines", "Airline");
+
+            _flightHeaderViewCell.Update("ONT", "Ontario, Intl", "->", "", "SEA", "Seattle-Tacoma Intl.");
+
+            _flightPositionViewCell.Update("324 KPH", "Ground Speed", "4.5 Ft/Sec", "Rate of Ascent", "13,000 ft", "Current Altitude");
         }
 
         private void Plane_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            switch (e.PropertyName)
-            {
-                case nameof(Plane.velocity):
-                    InvokeOnMainThread(() => UpdateVelocity(_currentPlane.velocity));
-                    break;
-
-                case nameof(Plane.vert_rate):
-                    InvokeOnMainThread(() => UpdateVertRate(_currentPlane.vert_rate));
-                    break;
-            }
+            InvokeOnMainThread(RefreshFromCurrentPlane);
         }
 
         public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
         {
-            switch (indexPath.Section)
+            if (indexPath.Section == 0)
             {
-                case 0:
-                    return _flightHeaderViewCell;
-
-                case 1:
-                    switch (indexPath.Row)
-                    {
-                        case 0:
-                            return _flightSpeedViewCell;
-
-                        case 1:
-                            return _flightVerticalSpeedViewCell;
-                    }
-                    break;
-
-                case 2:
-                    return actionViewCell;
+                switch (indexPath.Row)
+                {
+                    case 0: return _actionViewCell;
+                    case 1: return _flightStatusViewCell;
+                    case 2: return _flightPositionViewCell;
+                    case 3: return _flightProviderViewCell;
+                    case 4: return _flightHeaderViewCell;
+                }
             }
             return null;
         }
 
         public override nint RowsInSection(UITableView tableView, nint section)
         {
-            switch (section)
-            {
-                case 0:
-                    return 1;
-
-                case 1:
-                    return 2;
-
-                case 2:
-                    return 1;
-            }
-            return 0;
+            return 5;
         }
 
         public override nint NumberOfSections(UITableView tableView)
         {
-            return 3;
+            return 1;
         }
     }
 
-    internal class FlightHeaderViewCell : UITableViewCell
+    internal class ThreePartViewCell : UITableViewCell
     {
-        private UILabel _originCodeLabel;
-        private UILabel _destinationLabel;
-        private UILabel _originNameView;
-        private UILabel _destinationNameView;
+        private UILabel _valLabelOne;
+        private UILabel _valLabelThree;
+        private UILabel _valNameOne;
+        private UILabel _valNameThree;
 
-        private UILabel _arrowLabel;
+        private UILabel _valLabelTwo;
+        private UILabel _valNameTwo;
         private const int _margin = 16;
 
         public const int Height = 32 + 28 + 2 * 16;
 
-        public void Update(Plane plane)
+        public void Update(string fieldValOne, string fieldNameOne, string fieldValTwo, string fieldNameTwo, string fieldValThree, string fieldNameThree)
         {
-            _originCodeLabel.Text = "ORG";
-            _destinationLabel.Text = "DST";
-            _originNameView.Text = "Origin Airport";
-            _destinationNameView.Text = "Destination Airport";
+            _valLabelOne.Text = fieldValOne;
+            _valLabelTwo.Text = fieldValTwo;
+            _valLabelThree.Text = fieldValThree;
+
+            _valNameOne.Text = fieldNameOne;
+            _valNameTwo.Text = fieldNameTwo;
+            _valNameThree.Text = fieldNameThree;
         }
 
-        public FlightHeaderViewCell(string origin, string destination) : base()
+        public ThreePartViewCell() : base()
         {
-            _arrowLabel = new UILabel();
-            _arrowLabel.TranslatesAutoresizingMaskIntoConstraints = false;
-            _arrowLabel.Text = "->";
-            _arrowLabel.TextAlignment = UITextAlignment.Center;
-            _arrowLabel.Font = _arrowLabel.Font.WithSize(32);
+            _valLabelTwo = new UILabel();
+            _valLabelTwo.TranslatesAutoresizingMaskIntoConstraints = false;
+            _valLabelTwo.TextAlignment = UITextAlignment.Center;
+            _valLabelTwo.Font = _valLabelTwo.Font.WithSize(32);
 
-            _originCodeLabel = new UILabel();
-            _originCodeLabel.TranslatesAutoresizingMaskIntoConstraints = false;
-            _originCodeLabel.Text = origin;
-            _originCodeLabel.TextAlignment = UITextAlignment.Center;
-            _originCodeLabel.Font = _originCodeLabel.Font.WithSize(32);
+            _valNameTwo = new UILabel();
+            _valNameTwo.TranslatesAutoresizingMaskIntoConstraints = false;
+            _valNameTwo.TextAlignment = UITextAlignment.Center;
+            _valNameTwo.Font = _valNameTwo.Font.WithSize(18);
+            _valNameTwo.AdjustsFontSizeToFitWidth = true;
 
-            _destinationLabel = new UILabel();
-            _destinationLabel.TranslatesAutoresizingMaskIntoConstraints = false;
-            _destinationLabel.Text = destination;
-            _destinationLabel.TextAlignment = UITextAlignment.Center;
-            _destinationLabel.Font = _destinationLabel.Font.WithSize(32);
+            _valLabelOne = new UILabel();
+            _valLabelOne.TranslatesAutoresizingMaskIntoConstraints = false;
+            _valLabelOne.TextAlignment = UITextAlignment.Center;
+            _valLabelOne.Font = _valLabelOne.Font.WithSize(32);
 
-            _originNameView = new UILabel();
-            _originNameView.TranslatesAutoresizingMaskIntoConstraints = false;
-            _originNameView.Text = "Atlanta Intl. Airport";
-            _originNameView.TextAlignment = UITextAlignment.Center;
-            _originNameView.Font = _originNameView.Font.WithSize(18);
-            _originNameView.AdjustsFontSizeToFitWidth = true;
+            _valLabelThree = new UILabel();
+            _valLabelThree.TranslatesAutoresizingMaskIntoConstraints = false;
+            _valLabelThree.TextAlignment = UITextAlignment.Center;
+            _valLabelThree.Font = _valLabelThree.Font.WithSize(32);
 
-            _destinationNameView = new UILabel();
-            _destinationNameView.TranslatesAutoresizingMaskIntoConstraints = false;
-            _destinationNameView.Text = "Ontario, Intl. Airport";
-            _destinationNameView.TextAlignment = UITextAlignment.Center;
-            _destinationNameView.Font = _destinationNameView.Font.WithSize(18);
-            _destinationNameView.AdjustsFontSizeToFitWidth = true;
+            _valNameOne = new UILabel();
+            _valNameOne.TranslatesAutoresizingMaskIntoConstraints = false;
+            _valNameOne.TextAlignment = UITextAlignment.Center;
+            _valNameOne.Font = _valNameOne.Font.WithSize(18);
+            _valNameOne.AdjustsFontSizeToFitWidth = true;
 
-            this.ContentView.AddSubviews(_originCodeLabel, _destinationLabel, _arrowLabel, _originNameView, _destinationNameView);
+            _valNameThree = new UILabel();
+            _valNameThree.TranslatesAutoresizingMaskIntoConstraints = false;
+            _valNameThree.TextAlignment = UITextAlignment.Center;
+            _valNameThree.Font = _valNameThree.Font.WithSize(18);
+            _valNameThree.AdjustsFontSizeToFitWidth = true;
+
+            this.ContentView.AddSubviews(_valLabelOne, _valLabelThree, _valLabelTwo, _valNameTwo, _valNameOne, _valNameThree);
 
             NSLayoutConstraint.ActivateConstraints(new[]
             {
-                _originCodeLabel.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor, _margin),
-                _originCodeLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, _margin),
-                _originCodeLabel.TrailingAnchor.ConstraintEqualTo(_arrowLabel.LeadingAnchor, -_margin),
-                _originCodeLabel.HeightAnchor.ConstraintEqualTo(32),
-                _originNameView.HeightAnchor.ConstraintEqualTo(28),
-                _arrowLabel.CenterXAnchor.ConstraintEqualTo(ContentView.CenterXAnchor),
-                _arrowLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor),
-                _arrowLabel.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor),
-                _destinationLabel.TopAnchor.ConstraintEqualTo(_originCodeLabel.TopAnchor),
-                _destinationLabel.BottomAnchor.ConstraintEqualTo(_originCodeLabel.BottomAnchor),
-                _destinationLabel.LeadingAnchor.ConstraintEqualTo(_arrowLabel.TrailingAnchor, _margin),
-                _destinationLabel.TrailingAnchor.ConstraintEqualTo(ContentView.TrailingAnchor, -_margin),
-                _originNameView.LeadingAnchor.ConstraintEqualTo(_originCodeLabel.LeadingAnchor),
-                _originNameView.TrailingAnchor.ConstraintEqualTo(_originCodeLabel.TrailingAnchor),
-                _originNameView.TopAnchor.ConstraintEqualTo(_originCodeLabel.BottomAnchor),
-                _originNameView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -_margin),
-                _destinationNameView.LeadingAnchor.ConstraintEqualTo(_destinationLabel.LeadingAnchor),
-                _destinationNameView.TrailingAnchor.ConstraintEqualTo(_destinationLabel.TrailingAnchor),
-                _destinationNameView.TopAnchor.ConstraintEqualTo(_originNameView.TopAnchor),
-                _destinationNameView.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -_margin)
+                _valLabelOne.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor, _margin),
+                _valLabelOne.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, _margin),
+                _valLabelOne.TrailingAnchor.ConstraintEqualTo(_valLabelTwo.LeadingAnchor, -_margin),
+                _valLabelOne.HeightAnchor.ConstraintEqualTo(32),
+                _valNameOne.HeightAnchor.ConstraintEqualTo(28),
+                _valNameTwo.TopAnchor.ConstraintEqualTo(_valNameOne.TopAnchor),
+                _valNameTwo.BottomAnchor.ConstraintEqualTo(_valNameOne.BottomAnchor),
+                _valNameTwo.LeadingAnchor.ConstraintEqualTo(_valLabelTwo.LeadingAnchor),
+                _valNameTwo.TrailingAnchor.ConstraintEqualTo(_valLabelTwo.TrailingAnchor),
+                _valLabelTwo.CenterXAnchor.ConstraintEqualTo(ContentView.CenterXAnchor),
+                _valLabelTwo.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor),
+                _valLabelTwo.BottomAnchor.ConstraintEqualTo(_valLabelOne.BottomAnchor),
+                _valLabelThree.TopAnchor.ConstraintEqualTo(_valLabelOne.TopAnchor),
+                _valLabelThree.BottomAnchor.ConstraintEqualTo(_valLabelOne.BottomAnchor),
+                _valLabelThree.LeadingAnchor.ConstraintEqualTo(_valLabelTwo.TrailingAnchor, _margin),
+                _valLabelThree.TrailingAnchor.ConstraintEqualTo(ContentView.TrailingAnchor, -_margin),
+                _valNameOne.LeadingAnchor.ConstraintEqualTo(_valLabelOne.LeadingAnchor),
+                _valNameOne.TrailingAnchor.ConstraintEqualTo(_valLabelOne.TrailingAnchor),
+                _valNameOne.TopAnchor.ConstraintEqualTo(_valLabelOne.BottomAnchor),
+                _valNameOne.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -_margin),
+                _valNameThree.LeadingAnchor.ConstraintEqualTo(_valLabelThree.LeadingAnchor),
+                _valNameThree.TrailingAnchor.ConstraintEqualTo(_valLabelThree.TrailingAnchor),
+                _valNameThree.TopAnchor.ConstraintEqualTo(_valNameOne.TopAnchor),
+                _valNameThree.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -_margin)
             });
-        }
-    }
-
-    internal class FlightSpeedViewCell : UITableViewCell
-    {
-        public FlightSpeedViewCell() : base()
-        {
-            TextLabel.Text = $"Flight speed: ";
-        }
-    }
-
-    internal class FlightVerticalSpeedViewCell : UITableViewCell
-    {
-        public FlightVerticalSpeedViewCell() : base()
-        {
-            TextLabel.Text = "Vertical speed: too low";
         }
     }
 
@@ -284,6 +230,82 @@ namespace PlaneARViewer.BottomSheet
                 _FlyoverButton.TopAnchor.ConstraintEqualTo(_MapButton.TopAnchor),
                 _FlyoverButton.TrailingAnchor.ConstraintEqualTo(ContentView.TrailingAnchor, -margin),
                 _FlyoverButton.BottomAnchor.ConstraintEqualTo(_MapButton.BottomAnchor)
+            });
+        }
+    }
+
+    internal class TwoPartViewCell : UITableViewCell
+    {
+        private UILabel _firstValueLabel;
+        private UILabel _firstDescriptionLabel;
+        private UILabel _secondValueLabel;
+        private UILabel _secondDescriptionLabel;
+
+        private const int _margin = 16;
+
+        public const int Height = 32 + 28 + 2 * 16;
+
+        public void Update(UIColor foregroundColor, string firstVal, string firstDesc, string secondVal, string secondDesc)
+        {
+            _firstValueLabel.TextColor = foregroundColor;
+            _firstDescriptionLabel.TextColor = foregroundColor;
+            _secondValueLabel.TextColor = foregroundColor;
+            _secondDescriptionLabel.TextColor = foregroundColor;
+
+            _firstValueLabel.Text = firstVal;
+            _firstDescriptionLabel.Text = firstDesc;
+            _secondValueLabel.Text = secondVal;
+            _secondDescriptionLabel.Text = secondDesc;
+        }
+
+        public TwoPartViewCell() : base()
+        {
+            _firstValueLabel = new UILabel();
+            _firstValueLabel.TranslatesAutoresizingMaskIntoConstraints = false;
+            _firstValueLabel.TextAlignment = UITextAlignment.Center;
+            _firstValueLabel.Font = _firstValueLabel.Font.WithSize(32);
+            _firstValueLabel.AdjustsFontSizeToFitWidth = true;
+
+            _secondValueLabel = new UILabel();
+            _secondValueLabel.TranslatesAutoresizingMaskIntoConstraints = false;
+            _secondValueLabel.TextAlignment = UITextAlignment.Center;
+            _secondValueLabel.Font = _secondValueLabel.Font.WithSize(32);
+            _secondValueLabel.AdjustsFontSizeToFitWidth = true;
+
+            _firstDescriptionLabel = new UILabel();
+            _firstDescriptionLabel.TranslatesAutoresizingMaskIntoConstraints = false;
+            _firstDescriptionLabel.TextAlignment = UITextAlignment.Center;
+            _firstDescriptionLabel.Font = _firstDescriptionLabel.Font.WithSize(18);
+            _firstDescriptionLabel.AdjustsFontSizeToFitWidth = true;
+
+            _secondDescriptionLabel = new UILabel();
+            _secondDescriptionLabel.TranslatesAutoresizingMaskIntoConstraints = false;
+            _secondDescriptionLabel.TextAlignment = UITextAlignment.Center;
+            _secondDescriptionLabel.Font = _secondDescriptionLabel.Font.WithSize(18);
+            _secondDescriptionLabel.AdjustsFontSizeToFitWidth = true;
+
+            this.ContentView.AddSubviews(_firstValueLabel, _secondValueLabel, _firstDescriptionLabel, _secondDescriptionLabel);
+
+            NSLayoutConstraint.ActivateConstraints(new[]
+            {
+                _firstValueLabel.HeightAnchor.ConstraintEqualTo(32),
+                _firstDescriptionLabel.HeightAnchor.ConstraintEqualTo(28),
+                _firstValueLabel.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor, _margin),
+                _firstDescriptionLabel.LeadingAnchor.ConstraintEqualTo(_firstValueLabel.LeadingAnchor),
+                _firstValueLabel.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, _margin),
+                _firstDescriptionLabel.TopAnchor.ConstraintEqualTo(_firstValueLabel.BottomAnchor, _margin),
+                _secondValueLabel.TopAnchor.ConstraintEqualTo(_firstValueLabel.TopAnchor),
+                _secondValueLabel.HeightAnchor.ConstraintEqualTo(_firstValueLabel.HeightAnchor),
+                _secondDescriptionLabel.TopAnchor.ConstraintEqualTo(_firstDescriptionLabel.TopAnchor),
+                _secondDescriptionLabel.HeightAnchor.ConstraintEqualTo(_firstDescriptionLabel.HeightAnchor),
+                _secondValueLabel.TrailingAnchor.ConstraintEqualTo(ContentView.TrailingAnchor, -_margin),
+                _secondDescriptionLabel.TrailingAnchor.ConstraintEqualTo(_secondValueLabel.TrailingAnchor),
+                _firstValueLabel.TrailingAnchor.ConstraintEqualTo(ContentView.CenterXAnchor, -_margin),
+                _firstDescriptionLabel.TrailingAnchor.ConstraintEqualTo(_firstValueLabel.TrailingAnchor),
+                _secondValueLabel.LeadingAnchor.ConstraintEqualTo(ContentView.CenterXAnchor, _margin),
+                _secondDescriptionLabel.LeadingAnchor.ConstraintEqualTo(_secondValueLabel.LeadingAnchor),
+                _secondDescriptionLabel.BottomAnchor.ConstraintEqualTo(_firstDescriptionLabel.BottomAnchor),
+                _firstDescriptionLabel.BottomAnchor.ConstraintEqualTo(ContentView.BottomAnchor, -_margin)
             });
         }
     }

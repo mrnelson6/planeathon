@@ -41,10 +41,10 @@ namespace PlaneARViewer.BottomSheet
         {
             if (e.PropertyName == nameof(AirplaneFinder.SelectedPlane))
             {
-                _dataSource.Update(_airplaneFinder.SelectedPlane);
+                _dataSource.SetNewPlane(_airplaneFinder.SelectedPlane);
             }
         }
 
-        public int GetViewHeight() => 64 * 3 + FlightHeaderViewCell.Height;
+        public int GetViewHeight() => 64 * 3 + ThreePartViewCell.Height;
     }
 }
