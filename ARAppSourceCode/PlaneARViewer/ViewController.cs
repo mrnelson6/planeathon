@@ -273,7 +273,7 @@ namespace PlaneARViewer
 
         private void ShowMapView(object sender, EventArgs e)
         {
-            Console.WriteLine("Showmapview clicked");
+            NavigationController.PushViewController(new PlanesMapView(_arView.OriginCamera.Location), true);
         }
 
         private async void _arView_GeoViewTapped(object sender, Esri.ArcGISRuntime.UI.Controls.GeoViewInputEventArgs e)

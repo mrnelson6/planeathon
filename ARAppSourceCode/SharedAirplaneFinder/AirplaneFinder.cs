@@ -97,6 +97,7 @@ namespace SharedAirplaneFinder
         private ModelSceneSymbol smallPlane3DSymbol;
         private ModelSceneSymbol largePlane3DSymbol;
         private SpatialReference sr;
+        public ServiceFeatureTable sft;
 
         private static readonly HttpClient client = new HttpClient();
 
@@ -256,7 +257,6 @@ namespace SharedAirplaneFinder
                         {
                             Plane currPlane = planes[callsign];
                             currPlane.graphic.Geometry = ng;
-                            currPlane.graphic.IsSelected = true;
                             currPlane.graphic.Attributes["HEADING"] = heading + 180;
                             currPlane.graphic.Attributes["CALLSIGN"] = callsign;
                             currPlane.velocity = velocity;
@@ -281,7 +281,6 @@ namespace SharedAirplaneFinder
                                 Graphic gr = new Graphic(ng, smallPlane3DSymbol);
                                 gr.Attributes["HEADING"] = heading;
                                 gr.Attributes["CALLSIGN"] = callsign;
-                                gr.IsSelected = true;
                                 Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, false, callsign);
                                 planes.Add(callsign, p);
                                 _graphicsOverlay.Graphics.Add(gr);
@@ -295,7 +294,6 @@ namespace SharedAirplaneFinder
                                 Graphic gr = new Graphic(ng, largePlane3DSymbol);
                                 gr.Attributes["HEADING"] = heading + 180;
                                 gr.Attributes["CALLSIGN"] = callsign;
-                                gr.IsSelected = true;
                                 Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, true, callsign);
                                 planes.Add(callsign, p);
                                 _graphicsOverlay.Graphics.Add(gr);
@@ -326,8 +324,8 @@ namespace SharedAirplaneFinder
 
         private async Task queryFeatures()
         {
-            //
-            ServiceFeatureTable sft = new ServiceFeatureTable(new Uri("https://dev0011356.esri.com/server/rest/services/Hosted/Latest_Flights_1578796112/FeatureServer/0"));
+            //sft = new ServiceFeatureTable(new Uri("https://dev0011356.esri.com/server/rest/services/Hosted/Latest_Flights_1578796112/FeatureServer/0"));
+            sft = new ServiceFeatureTable(new Uri("https://services.arcgis.com/Wl7Y1m92PbjtJs5n/arcgis/rest/services/Current_Flights/FeatureServer/0"));
 
             MapPoint mp;
             if(center == null)
@@ -386,6 +384,7 @@ namespace SharedAirplaneFinder
                     }
 
                     MapPoint g = new MapPoint(lon, lat, alt, sr);
+                    //uncomment this if we switch to a live updating feature table
                     //Int32 time_difference = unixTimestamp - last_timestamp;
 
                     //List<MapPoint> lmp = new List<MapPoint>();
@@ -399,7 +398,6 @@ namespace SharedAirplaneFinder
                     {
                         Plane currPlane = planes[callsign];
                         currPlane.graphic.Geometry = ng;
-                        currPlane.graphic.IsSelected = true;
                         currPlane.graphic.Attributes["HEADING"] = heading + 180;
                         currPlane.graphic.Attributes["CALLSIGN"] = callsign;
                         currPlane.velocity = velocity;
@@ -414,7 +412,6 @@ namespace SharedAirplaneFinder
                             Graphic gr = new Graphic(ng, smallPlane3DSymbol);
                             gr.Attributes["HEADING"] = heading;
                             gr.Attributes["CALLSIGN"] = callsign;
-                            gr.IsSelected = true;
                             Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, false, callsign);
                             planes.Add(callsign, p);
                             _graphicsOverlay.Graphics.Add(gr);
@@ -424,7 +421,6 @@ namespace SharedAirplaneFinder
                             Graphic gr = new Graphic(ng, largePlane3DSymbol);
                             gr.Attributes["HEADING"] = heading + 180;
                             gr.Attributes["CALLSIGN"] = callsign;
-                            gr.IsSelected = true;
                             Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, true, callsign);
                             planes.Add(callsign, p);
                             _graphicsOverlay.Graphics.Add(gr);
@@ -443,7 +439,7 @@ namespace SharedAirplaneFinder
 
         public async Task queryPlanes()
         {
-           // await queryFeatures();
+            // await queryFeatures();
             await addPlanesViaAPI();
         }
 
@@ -491,7 +487,6 @@ namespace SharedAirplaneFinder
                         {
                             plane.Value.graphic.Attributes["HEADING"] = plane.Value.heading;
                         }
-                        plane.Value.graphic.IsSelected = false;
 
                         if (ShouldUpdateIdentifyOverlay)
                         {
