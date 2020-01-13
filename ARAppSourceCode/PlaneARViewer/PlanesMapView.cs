@@ -54,23 +54,20 @@ namespace PlaneARViewer
             Viewpoint vp = new Viewpoint(en);
             Map newMap = new Map(Basemap.CreateImageryWithLabels());
 
-
-            //ServiceFeatureTable sft = new ServiceFeatureTable(new Uri("https://services.arcgis.com/Wl7Y1m92PbjtJs5n/arcgis/rest/services/Current_Flights/FeatureServer/0"));
-            //FeatureLayer fl = new FeatureLayer(sft);
-            ////FeatureLayer fl = new FeatureLayer(sc.sft);
-            //await fl.LoadAsync();
-
-
             ArcGISPortal portal = await ArcGISPortal.CreateAsync(new Uri("https://runtime.maps.arcgis.com/"));
             PortalItem mapItem = await PortalItem.CreateAsync(portal, "b61d8171db5d4f9ea7c7f6c492949d3a");
-
-            //https://services.arcgis.com/Wl7Y1m92PbjtJs5n/arcgis/rest/services/Current_Flights/FeatureServer
-
             FeatureLayer fl = new FeatureLayer(mapItem, 0);
             await fl.LoadAsync();
 
+            //This code is used if we use the FeatureLayer
+            //FeatureLayer fl = new FeatureLayer(sc.sft);
+            //await fl.LoadAsync();
+
+            //TODO add code to select airplane that was used to enter this view
+
             newMap.OperationalLayers.Add(fl);
             newMap.InitialViewpoint = vp;
+
             mapView.Map = newMap;
         }
 
