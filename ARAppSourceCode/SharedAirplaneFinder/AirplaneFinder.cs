@@ -7,7 +7,6 @@ using Esri.ArcGISRuntime.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Timers;
@@ -158,9 +157,7 @@ namespace SharedAirplaneFinder
             _identifyOverlay.Opacity = 0.01;
             _identifyOverlay.Renderer = new SimpleRenderer(new SimpleMarkerSceneSymbol(SimpleMarkerSceneSymbolStyle.Sphere,
                 System.Drawing.Color.Red, 1000, 1000, 1000, SceneSymbolAnchorPosition.Center));
-
             await queryPlanes();
-
             _animationTimer = new Timer(1000 / updates_per_second)
             {
                 Enabled = true,
@@ -434,6 +431,7 @@ namespace SharedAirplaneFinder
         public async Task queryPlanes()
         {
             //This code is used if we use the FeatureLayer
+
             // await queryFeatures();
             await addPlanesViaAPI();
         }
@@ -567,6 +565,10 @@ namespace SharedAirplaneFinder
                             dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
                             dtDateTime = dtDateTime.AddSeconds(int.Parse(landingTime)).ToLocalTime();
                             string landTimeEnglish = dtDateTime.ToString();
+
+                            string estimatedLandingTime = iata2.Split("\"landingTimes\":{\"scheduled\":")[1].Split(",\"estimated\":")[1].Split(",")[0];
+                            int difference = (int.Parse(estimatedLandingTime) - int.Parse(landingTime)) / 60;
+                            dict.Add("MinutesLate", difference.ToString());
 
                             dict.Add("LandingTime", landTimeEnglish);
                             dict.Add("LandingUnix", landingTime);
