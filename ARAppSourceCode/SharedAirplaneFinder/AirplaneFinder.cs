@@ -317,6 +317,7 @@ namespace SharedAirplaneFinder
             }
         }
 
+        //This code is used if we use the FeatureLayer
         private async Task queryFeatures()
         {
             //sft = new ServiceFeatureTable(new Uri("https://dev0011356.esri.com/server/rest/services/Hosted/Latest_Flights_1578796112/FeatureServer/0"));
@@ -379,15 +380,13 @@ namespace SharedAirplaneFinder
                     }
 
                     MapPoint g = new MapPoint(lon, lat, alt, sr);
-                    //uncomment this if we switch to a live updating feature table
-                    //Int32 time_difference = unixTimestamp - last_timestamp;
+                    Int32 time_difference = unixTimestamp - last_timestamp;
 
-                    //List<MapPoint> lmp = new List<MapPoint>();
-                    //lmp.Add(g);
-                    //IReadOnlyList<MapPoint> new_location = GeometryEngine.MoveGeodetic(lmp, velocity * time_difference, LinearUnits.Meters, heading, AngularUnits.Degrees, GeodeticCurveType.Geodesic);
-                    //double dz = new_location[0].Z + (vert_rate * time_difference);
-                    //MapPoint ng = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
-                    MapPoint ng = g;
+                    List<MapPoint> lmp = new List<MapPoint>();
+                    lmp.Add(g);
+                    IReadOnlyList<MapPoint> new_location = GeometryEngine.MoveGeodetic(lmp, velocity * time_difference, LinearUnits.Meters, heading, AngularUnits.Degrees, GeodeticCurveType.Geodesic);
+                    double dz = new_location[0].Z + (vert_rate * time_difference);
+                    MapPoint ng = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
 
                     if (planes.ContainsKey(callsign))
                     {
@@ -434,6 +433,7 @@ namespace SharedAirplaneFinder
 
         public async Task queryPlanes()
         {
+            //This code is used if we use the FeatureLayer
             // await queryFeatures();
             await addPlanesViaAPI();
         }

@@ -56,6 +56,7 @@ namespace Test
             Scene newScene = new Scene(Basemap.CreateImageryWithLabels());
             
             //solves timing issues
+            //also useful for testing if featureservice is working correctly
             FeatureLayer trailHeadsLayer = new FeatureLayer(new Uri("https://services.arcgis.com/Wl7Y1m92PbjtJs5n/arcgis/rest/services/Current_Flights/FeatureServer/0"));
             await trailHeadsLayer.LoadAsync();
             //newScene.OperationalLayers.Add(trailHeadsLayer);
