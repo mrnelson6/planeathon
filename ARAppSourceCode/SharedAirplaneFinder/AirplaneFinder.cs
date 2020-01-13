@@ -7,6 +7,7 @@ using Esri.ArcGISRuntime.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Timers;
@@ -533,27 +534,27 @@ namespace SharedAirplaneFinder
                         {
                             // Main Data
                             string data = await content.ReadAsStringAsync();
-                            string iata1 = data.Split("iata\":\"")[1];
-                            string iata2 = data.Split("iata\":\"")[2];
+                            string iata1 = data.Split("iata\":\"".ToCharArray())[1];
+                            string iata2 = data.Split("iata\":\"".ToCharArray())[2];
 
                             // Departure airport
-                            var airport1Strings = iata1.Split("\",\"friendlyName\":\"");
+                            var airport1Strings = iata1.Split("\",\"friendlyName\":\"".ToCharArray());
                             string code1 = airport1Strings[0];
-                            string friendly1 = airport1Strings[1].Split("\",\"")[0];
+                            string friendly1 = airport1Strings[1].Split("\",\"".ToCharArray())[0];
 
                             dict.Add("DepAirportCode", code1);
                             dict.Add("DepAirportName", friendly1);
 
                             // Arrival airport
-                            var airport2Strings = iata2.Split("\",\"friendlyName\":\"");
+                            var airport2Strings = iata2.Split("\",\"friendlyName\":\"".ToCharArray());
                             string code2 = airport2Strings[0];
-                            string friendly2 = airport2Strings[1].Split("\",\"")[0];
+                            string friendly2 = airport2Strings[1].Split("\",\"".ToCharArray())[0];
 
                             dict.Add("ArrAirportCode", code2);
                             dict.Add("ArrAirportName", friendly2);
 
                             // Times
-                            string takeoffTime = iata2.Split("\"takeoffTimes\":{\"scheduled\":")[1].Split(",\"est")[0];
+                            string takeoffTime = iata2.Split("\"takeoffTimes\":{\"scheduled\":".ToCharArray())[1].Split(",\"est".ToCharArray())[0];
                             DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
                             dtDateTime = dtDateTime.AddSeconds(int.Parse(takeoffTime)).ToLocalTime();
                             string takeOffTimeEnglish = dtDateTime.ToString();
@@ -561,12 +562,12 @@ namespace SharedAirplaneFinder
                             dict.Add("TakeoffTime", takeOffTimeEnglish);
                             dict.Add("TakeoffUnix", takeoffTime);
 
-                            string landingTime = iata2.Split("\"landingTimes\":{\"scheduled\":")[1].Split(",\"est")[0];
+                            string landingTime = iata2.Split("\"landingTimes\":{\"scheduled\":".ToCharArray())[1].Split(",\"est".ToCharArray())[0];
                             dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
                             dtDateTime = dtDateTime.AddSeconds(int.Parse(landingTime)).ToLocalTime();
                             string landTimeEnglish = dtDateTime.ToString();
 
-                            string estimatedLandingTime = iata2.Split("\"landingTimes\":{\"scheduled\":")[1].Split(",\"estimated\":")[1].Split(",")[0];
+                            string estimatedLandingTime = iata2.Split("\"landingTimes\":{\"scheduled\":".ToCharArray())[1].Split(",\"estimated\":".ToCharArray())[1].Split(",".ToCharArray())[0];
                             int difference = (int.Parse(estimatedLandingTime) - int.Parse(landingTime)) / 60;
                             dict.Add("MinutesLate", difference.ToString());
 
@@ -574,10 +575,10 @@ namespace SharedAirplaneFinder
                             dict.Add("LandingUnix", landingTime);
 
                             // Airplane and airline info
-                            string airlineName = data.Split("<title>")[1].Split(" (")[0];
+                            string airlineName = data.Split("<title>".ToCharArray())[1].Split(" (".ToCharArray())[0];
                             dict.Add("AirlineName", airlineName);
 
-                            string aircraftType = data.Split("\"aircraftTypeFriendly\":\"")[1].Split("\"")[0];
+                            string aircraftType = data.Split("\"aircraftTypeFriendly\":\"".ToCharArray())[1].Split("\"".ToCharArray())[0];
                             dict.Add("AirplaneType", aircraftType);
 
                             return dict;
