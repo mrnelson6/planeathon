@@ -1,5 +1,4 @@
-﻿using System;
-using SharedAirplaneFinder;
+﻿using SharedAirplaneFinder;
 using UIKit;
 
 namespace PlaneARViewer.BottomSheet
@@ -11,8 +10,6 @@ namespace PlaneARViewer.BottomSheet
 
         public UIButton mapButton;
         public UIButton flyoverButton;
-       
-
 
         public FlightInfoViewController() : base()
         {

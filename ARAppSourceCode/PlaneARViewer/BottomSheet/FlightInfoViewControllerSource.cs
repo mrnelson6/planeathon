@@ -1,7 +1,7 @@
-﻿using System;
-using System.ComponentModel;
-using Foundation;
+﻿using Foundation;
 using SharedAirplaneFinder;
+using System;
+using System.ComponentModel;
 using UIKit;
 
 namespace PlaneARViewer.BottomSheet
@@ -56,7 +56,6 @@ namespace PlaneARViewer.BottomSheet
                 UpdateVelocity(_currentPlane.velocity);
                 UpdateVertRate(plane.vert_rate);
 
-
                 if (plane.big_plane)
                 {
                     _aircraftModelInfo.TextLabel.Text = "Big Plane";
@@ -95,6 +94,7 @@ namespace PlaneARViewer.BottomSheet
                 case nameof(Plane.velocity):
                     InvokeOnMainThread(() => UpdateVelocity(_currentPlane.velocity));
                     break;
+
                 case nameof(Plane.vert_rate):
                     InvokeOnMainThread(() => UpdateVertRate(_currentPlane.vert_rate));
                     break;
@@ -107,15 +107,18 @@ namespace PlaneARViewer.BottomSheet
             {
                 case 0:
                     return _flightHeaderViewCell;
+
                 case 1:
                     switch (indexPath.Row)
                     {
                         case 0:
                             return _flightSpeedViewCell;
+
                         case 1:
                             return _flightVerticalSpeedViewCell;
                     }
                     break;
+
                 case 2:
                     return actionViewCell;
             }
@@ -128,8 +131,10 @@ namespace PlaneARViewer.BottomSheet
             {
                 case 0:
                     return 1;
+
                 case 1:
                     return 2;
+
                 case 2:
                     return 1;
             }
