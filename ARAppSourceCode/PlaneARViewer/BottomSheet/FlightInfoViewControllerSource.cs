@@ -4,6 +4,7 @@ using SharedAirplaneFinder;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using UIKit;
 
 namespace PlaneARViewer.BottomSheet
@@ -17,20 +18,41 @@ namespace PlaneARViewer.BottomSheet
 
         private ThreePartViewCell _flightHeaderViewCell;
         private TwoPartViewCell _flightStatusViewCell;
-        private TwoPartViewCell _flightProviderViewCell;
-        private ThreePartViewCell _flightPositionViewCell;
+        private UITableViewCell _flightAltitudeViewCell;
+        private UITableViewCell _flightSpeedViewCell;
+        private UITableViewCell _flightAscentViewCell;
+        private UITableViewCell _airlineViewCell;
+        private UITableViewCell _airframeViewCell;
+        private UITableViewCell _callSignViewCell;
         public ActionViewCell _actionViewCell;
+
+        private UITableView _tableView;
+
+        private bool _hasFullDetails = false;
 
         public Plane _currentPlane;
         private Dictionary<string, string> _randomFacts;
 
-        public FlightInfoViewControllerDataSource() : base()
+        public FlightInfoViewControllerDataSource(UITableView tv) : base()
         {
             _flightHeaderViewCell = new ThreePartViewCell();
             _flightStatusViewCell = new TwoPartViewCell();
-            _flightProviderViewCell = new TwoPartViewCell();
-            _flightPositionViewCell = new ThreePartViewCell();
+            _flightAltitudeViewCell = new UITableViewCell(UITableViewCellStyle.Subtitle, nameof(_flightAltitudeViewCell));
+            _flightSpeedViewCell = new UITableViewCell(UITableViewCellStyle.Subtitle, nameof(_flightSpeedViewCell));
+            _flightAscentViewCell = new UITableViewCell(UITableViewCellStyle.Subtitle, nameof(_flightAscentViewCell));
+            _airframeViewCell = new UITableViewCell(UITableViewCellStyle.Subtitle, nameof(_airframeViewCell));
+            _airlineViewCell = new UITableViewCell(UITableViewCellStyle.Subtitle, nameof(_airlineViewCell));
+            _callSignViewCell = new UITableViewCell(UITableViewCellStyle.Subtitle, nameof(_callSignViewCell));
+
+            _flightAltitudeViewCell.DetailTextLabel.Text = "Current Altitude";
+            _flightSpeedViewCell.DetailTextLabel.Text = "Current Speed";
+            _airlineViewCell.DetailTextLabel.Text = "Airline";
+            _airframeViewCell.DetailTextLabel.Text = "Aircraft";
+            _callSignViewCell.DetailTextLabel.Text = "Flight #";
+
             _actionViewCell = new ActionViewCell();
+
+            _tableView = tv;
         }
 
         public void SetNewPlane(Plane plane)
@@ -57,16 +79,24 @@ namespace PlaneARViewer.BottomSheet
         private void RefreshFromCurrentPlane()
         {
             string movementName = _currentPlane.vert_rate > 0 ? "Ascent" : "Descent";
-            _flightPositionViewCell.Update($"{_currentPlane.velocity} MPH", "Ground Speed",
-                $"{Math.Abs(_currentPlane.vert_rate)} ft/sec", $"Rate of {movementName}", $"{((MapPoint)_currentPlane.graphic.Geometry).Z} ft", "Current Altitude");
+
+            _flightAscentViewCell.DetailTextLabel.Text = $"Rate of {movementName}";
+            _flightAscentViewCell.TextLabel.Text = $"{Math.Abs(_currentPlane.vert_rate)} ft/sec";
+            _flightAltitudeViewCell.TextLabel.Text = $"{((MapPoint)_currentPlane.graphic.Geometry).Z} ft";
+            _flightSpeedViewCell.TextLabel.Text = $"{_currentPlane.velocity} MPH";
+            _callSignViewCell.TextLabel.Text = _currentPlane.callsign;
         }
 
         private void RefreshFromRandomFacts()
         {
             if (_randomFacts == null)
             {
+                _hasFullDetails = false;
+                _tableView.ReloadData();
                 return;
             }
+
+            _hasFullDetails = true;
 
             string DepAirportCode = _randomFacts[nameof(DepAirportCode)];
             string DepAirportName = _randomFacts["DepAirportName"];
@@ -77,18 +107,26 @@ namespace PlaneARViewer.BottomSheet
             string takeofftime = _randomFacts["TakeoffTime"];
             string landingTime = _randomFacts["LandingTime"];
 
-            if (DateTime.Now.Second > 30) // flight is on time
+            int minutesLate;
+
+            if (int.TryParse(_randomFacts["MinutesLate"], out minutesLate))
             {
-                _flightStatusViewCell.Update(UIColor.SystemGreenColor, "1:23 PM", "Departure Time", "4:53 PM", "Estimated Arrival");
-            }
-            else
-            {
-                _flightStatusViewCell.Update(UIColor.SystemRedColor, takeofftime, "Departure Time", landingTime, "Estimated Arrival");
+                if (minutesLate > 5)
+                {
+                    _flightStatusViewCell.Update(UIColor.SystemRedColor, takeofftime, "Departure Time", landingTime, "Estimated Arrival");
+                }
+                else
+                {
+                    _flightStatusViewCell.Update(UIColor.SystemGreenColor, "1:23 PM", "Departure Time", "4:53 PM", "Estimated Arrival");
+                }
             }
 
-            _flightProviderViewCell.Update(UIColor.LabelColor, AirplaneType, "Aircraft Model", AirlineName, "Airline");
+            _airframeViewCell.TextLabel.Text = AirplaneType;
+            _airlineViewCell.TextLabel.Text = AirlineName;
 
             _flightHeaderViewCell.Update(DepAirportCode, DepAirportName, "->", "", ArrAirportCode, ArrAirportName);
+
+            _tableView.ReloadData();
         }
 
         private void Plane_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -100,20 +138,43 @@ namespace PlaneARViewer.BottomSheet
         {
             if (indexPath.Section == 0)
             {
-                switch (indexPath.Row)
+                if (_hasFullDetails)
                 {
-                    case 0: return _flightHeaderViewCell;
-                    case 1: return _flightStatusViewCell;
-                    case 2: return _flightPositionViewCell;
-                    case 3: return _flightProviderViewCell;
-                    case 4: return _actionViewCell;
+                    switch (indexPath.Row)
+                    {
+                        case 0: return _callSignViewCell;
+                        case 1: return _flightHeaderViewCell;
+                        case 2: return _flightStatusViewCell;
+                        case 3: return _flightSpeedViewCell;
+                        case 4: return _flightAltitudeViewCell;
+                        case 5: return _flightAscentViewCell;
+                        case 6: return _airlineViewCell;
+                        case 7: return _airframeViewCell;
+                        case 8: return _actionViewCell;
+                    }
                 }
+                else
+                {
+                    switch (indexPath.Row)
+                    {
+                        case 0: return _callSignViewCell;
+                        case 1: return _flightSpeedViewCell;
+                        case 2: return _flightAltitudeViewCell;
+                        case 3: return _flightAscentViewCell;
+                        case 4: return _actionViewCell;
+                    }
+                }
+                
             }
-            return null;
+            return new UITableViewCell();
         }
 
         public override nint RowsInSection(UITableView tableView, nint section)
         {
+            if (_hasFullDetails)
+            {
+                return 9;
+            }
             return 5;
         }
 
