@@ -54,19 +54,26 @@ namespace Test
         private async void CreateNewScene()
         {
             Scene newScene = new Scene(Basemap.CreateImageryWithLabels());
-            
+
             //solves timing issues
             //also useful for testing if featureservice is working correctly
-            FeatureLayer trailHeadsLayer = new FeatureLayer(new Uri("https://services.arcgis.com/Wl7Y1m92PbjtJs5n/arcgis/rest/services/Current_Flights/FeatureServer/0"));
-            await trailHeadsLayer.LoadAsync();
+            //FeatureLayer trailHeadsLayer = new FeatureLayer(new Uri("https://services.arcgis.com/Wl7Y1m92PbjtJs5n/arcgis/rest/services/Current_Flights/FeatureServer/0"));
+            //await trailHeadsLayer.LoadAsync();
             //newScene.OperationalLayers.Add(trailHeadsLayer);
+
+            ArcGISTiledElevationSource _elevationSource = new ArcGISTiledElevationSource(new Uri("https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer"));
+            await _elevationSource.LoadAsync();
+            Surface _elevationSurface = new Surface();
+            _elevationSurface.ElevationSources.Add(_elevationSource);
+            newScene.BaseSurface = _elevationSurface;
+
             Scene = newScene;
 
             _graphicsOverlay = new GraphicsOverlay();
             SceneView.GraphicsOverlays.Add(_graphicsOverlay);
 
             SpatialReference sr = new SpatialReference(4326);
-            MapPoint mp = new MapPoint(-117.18, 33.5556, 10000, sr);
+            MapPoint mp = new MapPoint(-117.18, 34.0, 10000, sr);
             Camera cm = new Camera(mp, 0, 90, 0);
             SceneView.SetViewpointCamera(cm);
 
