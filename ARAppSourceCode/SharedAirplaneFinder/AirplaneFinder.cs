@@ -528,6 +528,10 @@ namespace SharedAirplaneFinder
                             dtDateTime = dtDateTime.AddSeconds(int.Parse(landingTime)).ToLocalTime();
                             string landTimeEnglish = dtDateTime.ToString();
 
+                            string estimatedLandingTime = iata2.Split("\"landingTimes\":{\"scheduled\":")[1].Split(",\"estimated\":")[1].Split(",")[0];
+                            int difference = int.Parse(estimatedLandingTime) - int.Parse(landingTime);
+                            dict.Add("MinutesLate", difference.ToString());
+
                             dict.Add("LandingTime", landTimeEnglish);
                             dict.Add("LandingUnix", landingTime);
 
