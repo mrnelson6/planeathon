@@ -94,6 +94,11 @@ namespace PlaneARViewer
         public override async void ViewDidAppear(bool animated)
         {
             base.ViewDidAppear(animated);
+
+            if (NavigationController != null)
+            {
+                NavigationController.NavigationBarHidden = false;
+            }
         }
 
         public override async void ViewDidDisappear(bool animated)

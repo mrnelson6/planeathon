@@ -13,7 +13,7 @@ namespace PlaneARViewer.BottomSheet
 
         public FlightInfoViewController() : base()
         {
-            _dataSource = new FlightInfoViewControllerDataSource();
+            _dataSource = new FlightInfoViewControllerDataSource(TableView);
             TableView.DataSource = _dataSource;
             TableView.AllowsSelection = false;
             TableView.ScrollEnabled = true;

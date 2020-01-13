@@ -240,14 +240,14 @@ namespace PlaneARViewer
             _flightInfoVC_HorizontalConstraints = new NSLayoutConstraint[]
             {
                 _flightInfoVC.View.LeadingAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeadingAnchor),
-                _flightInfoVC.View.CenterYAnchor.ConstraintEqualTo(View.CenterYAnchor),
-                _flightInfoVC.View.HeightAnchor.ConstraintEqualTo(_flightInfoVC.GetViewHeight()),
+                _flightInfoVC.View.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, 16),
+                _flightInfoVC.View.BottomAnchor.ConstraintEqualTo(_arView.SafeAreaLayoutGuide.BottomAnchor, -16),
                 _flightInfoVC.View.WidthAnchor.ConstraintEqualTo(320)
             };
 
             _flightInfoVC_VerticalConstraints = new NSLayoutConstraint[]
             {
-                _flightInfoVC.View.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor),
+                _flightInfoVC.View.BottomAnchor.ConstraintEqualTo(_arView.SafeAreaLayoutGuide.BottomAnchor, -16),
                 _flightInfoVC.View.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
                 _flightInfoVC.View.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
                 _flightInfoVC.View.HeightAnchor.ConstraintEqualTo(_flightInfoVC.GetViewHeight())
@@ -258,6 +258,10 @@ namespace PlaneARViewer
         {
             base.ViewDidAppear(animated);
 
+            if (NavigationController != null)
+            {
+                NavigationController.NavigationBarHidden = true;
+            }
             // Start tracking as soon as the view has been shown.
             await _arView.StartTrackingAsync(ARLocationTrackingMode.Continuous);
 
