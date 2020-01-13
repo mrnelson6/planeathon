@@ -92,6 +92,7 @@ namespace PlaneARViewer.BottomSheet
             if (_randomFacts == null)
             {
                 _hasFullDetails = false;
+                _tableView.ReloadData();
                 return;
             }
 
