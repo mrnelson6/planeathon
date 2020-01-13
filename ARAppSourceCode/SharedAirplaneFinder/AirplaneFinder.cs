@@ -7,6 +7,7 @@ using Esri.ArcGISRuntime.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Timers;
@@ -143,6 +144,11 @@ namespace SharedAirplaneFinder
             smallPlane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(await GetSmallPlane()), small_plane_size);
             largePlane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(await GetLargePlane()), large_plane_size);
 
+            UniqueValue smallPlaneValue = new UniqueValue("N/A", "Small Plane", smallPlane3DSymbol, "small");
+            UniqueValue bigPlaneValue = new UniqueValue("N/A", "Big Plane", largePlane3DSymbol, "big");
+
+            var uvRenderer = new UniqueValueRenderer(new List<string>() { "PLANESIZE" }, new List<UniqueValue>() { bigPlaneValue, smallPlaneValue }, "", new SimpleMarkerSceneSymbol());
+
             _graphicsOverlay.SceneProperties.SurfacePlacement = SurfacePlacement.Absolute;
             _identifyOverlay.SceneProperties.SurfacePlacement = SurfacePlacement.Absolute;
             SimpleRenderer renderer3D = new SimpleRenderer();
@@ -152,7 +158,7 @@ namespace SharedAirplaneFinder
             renderProperties.PitchExpression = "[PITCH]";
             renderProperties.RollExpression = "[ROLL]";
             // Apply the renderer to the scene view's overlay
-            _graphicsOverlay.Renderer = renderer3D;
+            _graphicsOverlay.Renderer = uvRenderer;
 
             _identifyOverlay.Opacity = 0.01;
             _identifyOverlay.Renderer = new SimpleRenderer(new SimpleMarkerSceneSymbol(SimpleMarkerSceneSymbolStyle.Sphere,
@@ -270,9 +276,11 @@ namespace SharedAirplaneFinder
                         {
                             if (callsign.Length > 0 && callsign[0] == 'N')
                             {
-                                Graphic gr = new Graphic(ng, smallPlane3DSymbol);
+                                //Graphic gr = new Graphic(ng, smallPlane3DSymbol);
+                                Graphic gr = new Graphic(ng);
                                 gr.Attributes["HEADING"] = heading;
                                 gr.Attributes["CALLSIGN"] = callsign;
+                                gr.Attributes["PLANESIZE"] = "small";
                                 Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, false, callsign);
                                 planes.Add(callsign, p);
                                 _graphicsOverlay.Graphics.Add(gr);
@@ -283,9 +291,11 @@ namespace SharedAirplaneFinder
                             }
                             else
                             {
-                                Graphic gr = new Graphic(ng, largePlane3DSymbol);
+                                //Graphic gr = new Graphic(ng, largePlane3DSymbol);
+                                Graphic gr = new Graphic(ng);
                                 gr.Attributes["HEADING"] = heading + 180;
                                 gr.Attributes["CALLSIGN"] = callsign;
+                                gr.Attributes["PLANESIZE"] = "big";
                                 Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, true, callsign);
                                 planes.Add(callsign, p);
                                 _graphicsOverlay.Graphics.Add(gr);
@@ -400,18 +410,22 @@ namespace SharedAirplaneFinder
                     {
                         if (callsign.Length > 0 && callsign[0] == 'N')
                         {
-                            Graphic gr = new Graphic(ng, smallPlane3DSymbol);
+                            //Graphic gr = new Graphic(ng, smallPlane3DSymbol);
+                            Graphic gr = new Graphic(ng);
                             gr.Attributes["HEADING"] = heading;
                             gr.Attributes["CALLSIGN"] = callsign;
+                            gr.Attributes["PLANESIZE"] = "small";
                             Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, false, callsign);
                             planes.Add(callsign, p);
                             _graphicsOverlay.Graphics.Add(gr);
                         }
                         else
                         {
-                            Graphic gr = new Graphic(ng, largePlane3DSymbol);
+                            //Graphic gr = new Graphic(ng, largePlane3DSymbol);
+                            Graphic gr = new Graphic(ng);
                             gr.Attributes["HEADING"] = heading + 180;
                             gr.Attributes["CALLSIGN"] = callsign;
+                            gr.Attributes["PLANESIZE"] = "big";
                             Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, true, callsign);
                             planes.Add(callsign, p);
                             _graphicsOverlay.Graphics.Add(gr);
