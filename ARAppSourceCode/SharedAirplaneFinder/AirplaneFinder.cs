@@ -576,6 +576,10 @@ namespace SharedAirplaneFinder
 
                             // Airplane and airline info
                             string airlineName = data.Split("<title>")[1].Split(" (")[0];
+                            if(airlineName.Contains("Live Flight Tracking and History"))
+                            {
+                                airlineName = "N/A";
+                            }
                             dict.Add("AirlineName", airlineName);
 
                             string aircraftType = data.Split("\"aircraftTypeFriendly\":\"")[1].Split("\"")[0];
