@@ -103,8 +103,10 @@ namespace PlaneARViewer
                 _arView.Scene.BaseSurface.Opacity = 0.5;
                 _arView.Scene.BaseSurface.NavigationConstraint = NavigationConstraint.StayAbove;
                 _graphicsOverlay = new GraphicsOverlay();
+                GraphicsOverlay _identifyOverlay = new GraphicsOverlay();
+                
                 _arView.GraphicsOverlays.Add(_graphicsOverlay);
-                _airplaneFinder = new SharedAirplaneFinder.AirplaneFinder(_graphicsOverlay);
+                _airplaneFinder = new SharedAirplaneFinder.AirplaneFinder(_graphicsOverlay, _identifyOverlay);
                 _airplaneFinder.center = _locationSource.LastLocation.Position;
                 _airplaneFinder.setupScene();
                 _flightInfoVC.AssociateAirplaneFinder(_airplaneFinder);
@@ -271,12 +273,16 @@ namespace PlaneARViewer
 
         private void ShowMapView(object sender, EventArgs e)
         {
-            Console.WriteLine("Showmapview clicked");
+            NavigationController.PushViewController(new PlanesMapView(_arView.OriginCamera.Location), true);
         }
 
         private async void _arView_GeoViewTapped(object sender, Esri.ArcGISRuntime.UI.Controls.GeoViewInputEventArgs e)
         {
-            var res = await _arView.IdentifyGraphicsOverlayAsync(_airplaneFinder._graphicsOverlay, e.Position, 80, false);
+            _airplaneFinder.ShouldUpdateIdentifyOverlay = false;
+            _arView.GraphicsOverlays.Add(_airplaneFinder._identifyOverlay);
+            var res = await _arView.IdentifyGraphicsOverlayAsync(_airplaneFinder._identifyOverlay, e.Position, 64, false, 1);
+            _arView.GraphicsOverlays.Remove(_airplaneFinder._identifyOverlay);
+            _airplaneFinder.ShouldUpdateIdentifyOverlay = true;
             if (res.Graphics.Any())
             {
                 Console.WriteLine(res.Graphics.First());

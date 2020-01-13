@@ -54,12 +54,14 @@ namespace Test
         private async void CreateNewScene()
         {
             Scene newScene = new Scene(Basemap.CreateImageryWithLabels());
+            
+            //solves timing issues
+            //also useful for testing if featureservice is working correctly
+            FeatureLayer trailHeadsLayer = new FeatureLayer(new Uri("https://services.arcgis.com/Wl7Y1m92PbjtJs5n/arcgis/rest/services/Current_Flights/FeatureServer/0"));
+            await trailHeadsLayer.LoadAsync();
+            //newScene.OperationalLayers.Add(trailHeadsLayer);
             Scene = newScene;
 
-            //solves timing issues
-            FeatureLayer trailHeadsLayer = new FeatureLayer(new Uri("https://services3.arcgis.com/GVgbJbqm8hXASVYi/arcgis/rest/services/Trailheads/FeatureServer/0"));
-            await trailHeadsLayer.LoadAsync();
-    
             _graphicsOverlay = new GraphicsOverlay();
             SceneView.GraphicsOverlays.Add(_graphicsOverlay);
 
@@ -68,7 +70,8 @@ namespace Test
             Camera cm = new Camera(mp, 0, 90, 0);
             SceneView.SetViewpointCamera(cm);
 
-            SharedAirplaneFinder.AirplaneFinder sc = new SharedAirplaneFinder.AirplaneFinder(_graphicsOverlay);
+            GraphicsOverlay _graphicsOverlay2 = new GraphicsOverlay();
+            SharedAirplaneFinder.AirplaneFinder sc = new SharedAirplaneFinder.AirplaneFinder(_graphicsOverlay, _graphicsOverlay2);
             sc.center = mp;
             sc.setupScene();
         }

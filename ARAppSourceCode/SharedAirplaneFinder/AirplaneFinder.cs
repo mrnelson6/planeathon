@@ -93,6 +93,7 @@ namespace SharedAirplaneFinder
         private ModelSceneSymbol smallPlane3DSymbol;
         private ModelSceneSymbol largePlane3DSymbol;
         private SpatialReference sr;
+        public ServiceFeatureTable sft;
 
         private static readonly HttpClient client = new HttpClient();
 
@@ -104,6 +105,11 @@ namespace SharedAirplaneFinder
         public int large_plane_size = 20;
         public int seconds_per_cleanup = 30;
         public double coord_tolerance = 0.5;
+
+        public bool ShouldUpdateIdentifyOverlay = true;
+
+        // Overlay for identification purposes only.
+        public GraphicsOverlay _identifyOverlay;
 
         private Plane _selectedPlane;
         public Plane SelectedPlane
@@ -121,9 +127,10 @@ namespace SharedAirplaneFinder
 
         public MapPoint center;
 
-        public AirplaneFinder(GraphicsOverlay go)
+        public AirplaneFinder(GraphicsOverlay go, GraphicsOverlay identifyOverlay)
         {
             _graphicsOverlay = go;
+            _identifyOverlay = identifyOverlay;
         }
 
         public async void setupScene()
@@ -137,6 +144,7 @@ namespace SharedAirplaneFinder
             largePlane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(await GetLargePlane()), large_plane_size);
 
             _graphicsOverlay.SceneProperties.SurfacePlacement = SurfacePlacement.Absolute;
+            _identifyOverlay.SceneProperties.SurfacePlacement = SurfacePlacement.Absolute;
             SimpleRenderer renderer3D = new SimpleRenderer();
             RendererSceneProperties renderProperties = renderer3D.SceneProperties;
             // Use expressions to keep the renderer properties updated as parameters of the rendered object
@@ -146,8 +154,10 @@ namespace SharedAirplaneFinder
             // Apply the renderer to the scene view's overlay
             _graphicsOverlay.Renderer = renderer3D;
 
+            _identifyOverlay.Opacity = 0.01;
+            _identifyOverlay.Renderer = new SimpleRenderer(new SimpleMarkerSceneSymbol(SimpleMarkerSceneSymbolStyle.Sphere,
+                System.Drawing.Color.Red, 1000, 1000, 1000, SceneSymbolAnchorPosition.Center));
             await queryPlanes();
-
             _animationTimer = new Timer(1000 / updates_per_second)
             {
                 Enabled = true,
@@ -233,18 +243,28 @@ namespace SharedAirplaneFinder
                         IReadOnlyList<MapPoint> new_location = GeometryEngine.MoveGeodetic(lmp, velocity * time_difference, LinearUnits.Meters, heading, AngularUnits.Degrees, GeodeticCurveType.Geodesic);
                         double dz = new_location[0].Z + (vert_rate * time_difference);
                         MapPoint ng = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
+                        MapPoint identifyGeometry = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
 
                         if (planes.ContainsKey(callsign))
                         {
                             Plane currPlane = planes[callsign];
                             currPlane.graphic.Geometry = ng;
-                            currPlane.graphic.IsSelected = true;
                             currPlane.graphic.Attributes["HEADING"] = heading + 180;
                             currPlane.graphic.Attributes["CALLSIGN"] = callsign;
                             currPlane.velocity = velocity;
                             currPlane.vert_rate = vert_rate;
                             currPlane.heading = heading;
                             currPlane.last_update = last_timestamp;
+
+                            if (ShouldUpdateIdentifyOverlay)
+                            {
+                                var res = _identifyOverlay.Graphics.Where(gxxx => gxxx.Attributes["CALLSIGN"].ToString() == callsign);
+
+                                if (res.Any())
+                                {
+                                    res.First().Geometry = identifyGeometry;
+                                }
+                            }
                         }
                         else
                         {
@@ -253,20 +273,29 @@ namespace SharedAirplaneFinder
                                 Graphic gr = new Graphic(ng, smallPlane3DSymbol);
                                 gr.Attributes["HEADING"] = heading;
                                 gr.Attributes["CALLSIGN"] = callsign;
-                                gr.IsSelected = true;
                                 Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, false, callsign);
                                 planes.Add(callsign, p);
                                 _graphicsOverlay.Graphics.Add(gr);
+
+                                var identifyGraphic = new Graphic(identifyGeometry);
+                                identifyGraphic.Attributes["CALLSIGN"] = callsign;
+                                _identifyOverlay.Graphics.Add(identifyGraphic);
                             }
                             else
                             {
                                 Graphic gr = new Graphic(ng, largePlane3DSymbol);
                                 gr.Attributes["HEADING"] = heading + 180;
                                 gr.Attributes["CALLSIGN"] = callsign;
-                                gr.IsSelected = true;
                                 Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, true, callsign);
                                 planes.Add(callsign, p);
                                 _graphicsOverlay.Graphics.Add(gr);
+
+                                if (ShouldUpdateIdentifyOverlay)
+                                {
+                                    var identifyGraphic = new Graphic(identifyGeometry);
+                                    identifyGraphic.Attributes["CALLSIGN"] = callsign;
+                                    _identifyOverlay.Graphics.Add(identifyGraphic);
+                                }
                             }
                         }
 
@@ -285,10 +314,11 @@ namespace SharedAirplaneFinder
             }
         }
 
+        //This code is used if we use the FeatureLayer
         private async Task queryFeatures()
         {
-            //
-            ServiceFeatureTable sft = new ServiceFeatureTable(new Uri("https://dev0011356.esri.com/server/rest/services/Hosted/Latest_Flights_1578796112/FeatureServer/0"));
+            //sft = new ServiceFeatureTable(new Uri("https://dev0011356.esri.com/server/rest/services/Hosted/Latest_Flights_1578796112/FeatureServer/0"));
+            sft = new ServiceFeatureTable(new Uri("https://services.arcgis.com/Wl7Y1m92PbjtJs5n/arcgis/rest/services/Current_Flights/FeatureServer/0"));
 
             MapPoint mp;
             if (center == null)
@@ -347,20 +377,18 @@ namespace SharedAirplaneFinder
                     }
 
                     MapPoint g = new MapPoint(lon, lat, alt, sr);
-                    //Int32 time_difference = unixTimestamp - last_timestamp;
+                    Int32 time_difference = unixTimestamp - last_timestamp;
 
-                    //List<MapPoint> lmp = new List<MapPoint>();
-                    //lmp.Add(g);
-                    //IReadOnlyList<MapPoint> new_location = GeometryEngine.MoveGeodetic(lmp, velocity * time_difference, LinearUnits.Meters, heading, AngularUnits.Degrees, GeodeticCurveType.Geodesic);
-                    //double dz = new_location[0].Z + (vert_rate * time_difference);
-                    //MapPoint ng = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
-                    MapPoint ng = g;
+                    List<MapPoint> lmp = new List<MapPoint>();
+                    lmp.Add(g);
+                    IReadOnlyList<MapPoint> new_location = GeometryEngine.MoveGeodetic(lmp, velocity * time_difference, LinearUnits.Meters, heading, AngularUnits.Degrees, GeodeticCurveType.Geodesic);
+                    double dz = new_location[0].Z + (vert_rate * time_difference);
+                    MapPoint ng = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
 
                     if (planes.ContainsKey(callsign))
                     {
                         Plane currPlane = planes[callsign];
                         currPlane.graphic.Geometry = ng;
-                        currPlane.graphic.IsSelected = true;
                         currPlane.graphic.Attributes["HEADING"] = heading + 180;
                         currPlane.graphic.Attributes["CALLSIGN"] = callsign;
                         currPlane.velocity = velocity;
@@ -375,7 +403,6 @@ namespace SharedAirplaneFinder
                             Graphic gr = new Graphic(ng, smallPlane3DSymbol);
                             gr.Attributes["HEADING"] = heading;
                             gr.Attributes["CALLSIGN"] = callsign;
-                            gr.IsSelected = true;
                             Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, false, callsign);
                             planes.Add(callsign, p);
                             _graphicsOverlay.Graphics.Add(gr);
@@ -385,7 +412,6 @@ namespace SharedAirplaneFinder
                             Graphic gr = new Graphic(ng, largePlane3DSymbol);
                             gr.Attributes["HEADING"] = heading + 180;
                             gr.Attributes["CALLSIGN"] = callsign;
-                            gr.IsSelected = true;
                             Plane p = new Plane(gr, velocity, vert_rate, heading, last_timestamp, true, callsign);
                             planes.Add(callsign, p);
                             _graphicsOverlay.Graphics.Add(gr);
@@ -404,6 +430,8 @@ namespace SharedAirplaneFinder
 
         public async Task queryPlanes()
         {
+            //This code is used if we use the FeatureLayer
+
             // await queryFeatures();
             await addPlanesViaAPI();
         }
@@ -422,6 +450,7 @@ namespace SharedAirplaneFinder
                     if (unixTimestamp - plane.Value.last_update > seconds_per_cleanup)
                     {
                         _graphicsOverlay.Graphics.Remove(plane.Value.graphic);
+                        _identifyOverlay.Graphics.Remove(_identifyOverlay.Graphics.Where(g => g.Attributes["CALLSIGN"].ToString() == plane.Value.callsign).First());
                         planes_to_remove.Add(plane.Key);
                     }
                 }
@@ -451,7 +480,16 @@ namespace SharedAirplaneFinder
                         {
                             plane.Value.graphic.Attributes["HEADING"] = plane.Value.heading;
                         }
-                        plane.Value.graphic.IsSelected = false;
+
+                        if (ShouldUpdateIdentifyOverlay)
+                        {
+                            var res = _identifyOverlay.Graphics.Where(gxxxx => gxxxx.Attributes["CALLSIGN"].ToString() == plane.Value.callsign).FirstOrDefault();
+                            if (res != null)
+                            {
+                                res.Geometry = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
+                            }
+                        }
+                        
                     }
                 }
                 catch (Exception ex)

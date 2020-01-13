@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDisplayName</key>
-	<string>PlaneARViewer</string>
+	<string>Sonderfly</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.esri.test.xx</string>
 	<key>CFBundleShortVersionString</key>
@@ -41,7 +41,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>For Augmented Reality</string>
 	<key>CFBundleName</key>
-	<string>PlaneARViewer</string>
+	<string>Sonderfly</string>
   <key>NSAppTransportSecurity</key>
   <dict>
     <key>NSExceptionDomains</key>
