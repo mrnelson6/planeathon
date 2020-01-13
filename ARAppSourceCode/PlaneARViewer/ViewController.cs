@@ -2,24 +2,24 @@
 using Esri.ArcGISRuntime.Location;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.UI;
+using PlaneARViewer.BottomSheet;
 using PlaneARViewer.Calibration;
+using SharedAirplaneFinder;
 using System;
 using System.Linq;
 using System.Timers;
 using UIKit;
-using PlaneARViewer.BottomSheet;
-using SharedAirplaneFinder;
-
 
 namespace PlaneARViewer
 {
     public partial class ViewController : UIViewController
     {
-        private SharedAirplaneFinder.AirplaneFinder sc;
+        private SharedAirplaneFinder.AirplaneFinder _airplaneFinder;
 
         // UI objects.
         private ARSceneView _arView;
         private UILabel _helpLabel;
+        private UIToolbar _flyoverToolbar;
 
         // Location data source for AR and route tracking.
         private AdjustableLocationDataSource _locationSource = new AdjustableLocationDataSource();
@@ -32,7 +32,7 @@ namespace PlaneARViewer
 
         // Overlay for testing plane graphics.
         private GraphicsOverlay _graphicsOverlay;
-        
+
         // Using the view from an aircraft.
         private bool _fromPlaneView;
         private Camera _groundCamera;
@@ -96,10 +96,10 @@ namespace PlaneARViewer
                 _arView.Scene.BaseSurface.NavigationConstraint = NavigationConstraint.StayAbove;
                 _graphicsOverlay = new GraphicsOverlay();
                 _arView.GraphicsOverlays.Add(_graphicsOverlay);
-                sc = new SharedAirplaneFinder.AirplaneFinder(_graphicsOverlay);
-                sc.center = _locationSource.LastLocation.Position;
-                sc.setupScene();
-                _flightInfoVC.AssociateAirplaneFinder(sc);
+                _airplaneFinder = new SharedAirplaneFinder.AirplaneFinder(_graphicsOverlay);
+                _airplaneFinder.center = _locationSource.LastLocation.Position;
+                _airplaneFinder.setupScene();
+                _flightInfoVC.AssociateAirplaneFinder(_airplaneFinder);
                 // Disable scene interaction.
                 _arView.InteractionOptions = new SceneViewInteractionOptions() { IsEnabled = false };
 
@@ -144,8 +144,9 @@ namespace PlaneARViewer
         {
             View = new UIView { BackgroundColor = UIColor.White };
 
-            //UIToolbar toolbar = new UIToolbar();
-            //toolbar.TranslatesAutoresizingMaskIntoConstraints = false;
+            _flyoverToolbar = new UIToolbar();
+            _flyoverToolbar.TranslatesAutoresizingMaskIntoConstraints = false;
+            _flyoverToolbar.Hidden = true;
 
             _arView = new ARSceneView();
             _arView.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -156,18 +157,19 @@ namespace PlaneARViewer
             //_helpLabel.TextColor = UIColor.White;
             //_helpLabel.BackgroundColor = UIColor.FromWhiteAlpha(0, 0.6f);
             //_helpLabel.Text = "Plane Gang 2020";
-
-            //toolbar.Items = new[]
-            //{
-            //    new UIBarButtonItem(UIBarButtonSystemItem.FlexibleSpace),
-            //};
+            var backButton = new UIBarButtonItem() { Title = "Back to ground" };
+            backButton.Clicked += (s, e) => DisableFromPlaneView();
+            _flyoverToolbar.Items = new[]
+            {
+                backButton
+            };
 
             _flightInfoVC = new FlightInfoViewController();
 
             AddChildViewController(_flightInfoVC);
             _flightInfoVC.View.TranslatesAutoresizingMaskIntoConstraints = false;
 
-            View.AddSubviews(_arView);//, toolbar);//, _helpLabel);
+            View.AddSubviews(_arView, _flyoverToolbar);//, toolbar);//, _helpLabel);
 
             NSLayoutConstraint.ActivateConstraints(new[]
             {
@@ -175,9 +177,9 @@ namespace PlaneARViewer
                 _arView.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
                 _arView.TopAnchor.ConstraintEqualTo(View.TopAnchor),
                 _arView.BottomAnchor.ConstraintEqualTo(View.BottomAnchor),
-                //toolbar.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
-                //toolbar.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
-                //toolbar.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor),
+                _flyoverToolbar.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
+                _flyoverToolbar.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
+                _flyoverToolbar.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor),
                 //_helpLabel.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
                 //_helpLabel.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
                 //_helpLabel.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
@@ -209,20 +211,33 @@ namespace PlaneARViewer
             await _arView.StartTrackingAsync(ARLocationTrackingMode.Continuous);
 
             _arView.GeoViewTapped += _arView_GeoViewTapped;
+            _flightInfoVC.mapButton.TouchUpInside += ShowMapView;
+            _flightInfoVC.flyoverButton.TouchUpInside += ShowFlyoverView;
+        }
+
+        private void ShowFlyoverView(object sender, EventArgs e)
+        {
+            EnableFromPlaneView();
+        }
+
+        private void ShowMapView(object sender, EventArgs e)
+        {
+            Console.WriteLine("Showmapview clicked");
         }
 
         private async void _arView_GeoViewTapped(object sender, Esri.ArcGISRuntime.UI.Controls.GeoViewInputEventArgs e)
         {
-            var res = await _arView.IdentifyGraphicsOverlayAsync(sc._graphicsOverlay, e.Position, 64, false);
+            var res = await _arView.IdentifyGraphicsOverlayAsync(_airplaneFinder._graphicsOverlay, e.Position, 80, false);
             if (res.Graphics.Any())
             {
                 Console.WriteLine(res.Graphics.First());
 
                 string callsign = res.Graphics.First().Attributes["CALLSIGN"] as string;
 
-                if (sc.planes.ContainsKey(callsign)){
-                    Plane targetPlane = sc.planes[callsign];
-                    sc.SelectedPlane = targetPlane;
+                if (_airplaneFinder.planes.ContainsKey(callsign))
+                {
+                    Plane targetPlane = _airplaneFinder.planes[callsign];
+                    _airplaneFinder.SelectedPlane = targetPlane;
 
                     View.AddSubview(_flightInfoVC.View);
 
@@ -244,8 +259,17 @@ namespace PlaneARViewer
             }
         }
 
-        private async void EnableFromPlaneView(Graphic selectedPlane, string callSign)
+        private async void EnableFromPlaneView()
         {
+            NSLayoutConstraint.DeactivateConstraints(_flightInfoVC_HorizontalConstraints);
+            NSLayoutConstraint.DeactivateConstraints(_flightInfoVC_VerticalConstraints);
+            _flightInfoVC.View.RemoveFromSuperview();
+
+            _flyoverToolbar.Hidden = false;
+
+            Graphic selectedPlane = _flightInfoVC.GetPlane().graphic;
+            string callSign = _flightInfoVC.GetPlane().callsign;
+
             _arView.GeoViewTapped -= _arView_GeoViewTapped;
 
             // Store the ground camera position.
@@ -278,16 +302,22 @@ namespace PlaneARViewer
 
         private void AnimationTimerElapsed(string callSign)
         {
-            _arView.OriginCamera = _arView.OriginCamera.MoveTo(sc.planes[callSign].graphic.Geometry.Extent.GetCenter());
+            _arView.OriginCamera = _arView.OriginCamera.MoveTo(_airplaneFinder.planes[callSign].graphic.Geometry.Extent.GetCenter());
 
             // Update center point so plane doesnt go out of boundary.
-            sc.center = _arView.OriginCamera.Location;
+            _airplaneFinder.center = _arView.OriginCamera.Location;
         }
 
         private void DisableFromPlaneView()
         {
+            // Hide flyover toolbar
+            _flyoverToolbar.Hidden = true;
             _animationTimer?.Stop();
             _arView.OriginCamera = _groundCamera;
+            _airplaneFinder.center = _groundCamera.Location;
+
+            // Re-enable plane graphic
+            _flightInfoVC.GetPlane().graphic.IsVisible = true;
 
             // Configure scene view display for real-scale AR: no space effect or atmosphere effect.
             _arView.SpaceEffect = SpaceEffect.None;
@@ -306,6 +336,7 @@ namespace PlaneARViewer
 
             // Stop ARKit tracking and unsubscribe from events when the view closes.
             await _arView?.StopTrackingAsync();
+            _arView.GeoViewTapped -= _arView_GeoViewTapped;
         }
 
         public override void TraitCollectionDidChange(UITraitCollection previousTraitCollection)

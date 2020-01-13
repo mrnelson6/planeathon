@@ -9,6 +9,11 @@ namespace PlaneARViewer.BottomSheet
         private AirplaneFinder _airplaneFinder;
         private FlightInfoViewControllerDataSource _dataSource;
 
+        public UIButton mapButton;
+        public UIButton flyoverButton;
+       
+
+
         public FlightInfoViewController() : base()
         {
             _dataSource = new FlightInfoViewControllerDataSource();
@@ -16,8 +21,16 @@ namespace PlaneARViewer.BottomSheet
             TableView.AllowsSelection = false;
             TableView.ScrollEnabled = false;
 
+            mapButton = _dataSource.actionViewCell._MapButton;
+            flyoverButton = _dataSource.actionViewCell._FlyoverButton;
+
             View.Layer.CornerRadius = 16;
             View.Layer.Opacity = 0.9f;
+        }
+
+        public Plane GetPlane()
+        {
+            return _dataSource?._currentPlane;
         }
 
         public void AssociateAirplaneFinder(AirplaneFinder airplaneFinder)

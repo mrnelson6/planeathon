@@ -92,7 +92,7 @@ namespace SharedAirplaneFinder
 
     class AirplaneFinder : INotifyPropertyChanged
     {
-        private Timer _animationTimer;
+        public Timer _animationTimer;
         public Dictionary<String, Plane> planes = new Dictionary<String, Plane>();
         private ModelSceneSymbol smallPlane3DSymbol;
         private ModelSceneSymbol largePlane3DSymbol;

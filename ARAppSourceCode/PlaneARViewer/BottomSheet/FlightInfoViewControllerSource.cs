@@ -14,9 +14,9 @@ namespace PlaneARViewer.BottomSheet
         private UITableViewCell _aircraftModelInfo;
         private UITableViewCell _aircraftAgeInfo;
 
-        private ActionViewCell actionViewCell = new ActionViewCell();
+        public ActionViewCell actionViewCell = new ActionViewCell();
 
-        private Plane _currentPlane;
+        public Plane _currentPlane;
 
         public FlightInfoViewControllerDataSource() : base()
         {
@@ -240,10 +240,10 @@ namespace PlaneARViewer.BottomSheet
         }
     }
 
-    internal class ActionViewCell : UITableViewCell
+    public class ActionViewCell : UITableViewCell
     {
-        private UIButton _MapButton;
-        private UIButton _FlyoverButton;
+        public UIButton _MapButton;
+        public UIButton _FlyoverButton;
 
         private const int margin = 16;
         private const int controlHeight = 32;
