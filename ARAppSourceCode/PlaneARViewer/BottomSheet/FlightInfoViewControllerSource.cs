@@ -191,8 +191,7 @@ namespace PlaneARViewer.BottomSheet
         private UILabel _valNameOne;
         private UILabel _valNameThree;
 
-        private UILabel _valLabelTwo;
-        private UILabel _valNameTwo;
+        private UIImageView _centerPlaneImage;
         private const int _margin = 16;
 
         public const int Height = 32 + 28 + 2 * 16;
@@ -200,26 +199,18 @@ namespace PlaneARViewer.BottomSheet
         public void Update(string fieldValOne, string fieldNameOne, string fieldValTwo, string fieldNameTwo, string fieldValThree, string fieldNameThree)
         {
             _valLabelOne.Text = fieldValOne;
-            _valLabelTwo.Text = fieldValTwo;
             _valLabelThree.Text = fieldValThree;
 
             _valNameOne.Text = fieldNameOne;
-            _valNameTwo.Text = fieldNameTwo;
             _valNameThree.Text = fieldNameThree;
         }
 
         public ThreePartViewCell() : base()
         {
-            _valLabelTwo = new UILabel();
-            _valLabelTwo.TranslatesAutoresizingMaskIntoConstraints = false;
-            _valLabelTwo.TextAlignment = UITextAlignment.Center;
-            _valLabelTwo.Font = _valLabelTwo.Font.WithSize(32);
-
-            _valNameTwo = new UILabel();
-            _valNameTwo.TranslatesAutoresizingMaskIntoConstraints = false;
-            _valNameTwo.TextAlignment = UITextAlignment.Center;
-            _valNameTwo.Font = _valNameTwo.Font.WithSize(18);
-            _valNameTwo.AdjustsFontSizeToFitWidth = true;
+            _centerPlaneImage = new UIImageView();
+            _centerPlaneImage.Image = UIImage.GetSystemImage("airplane");
+            _centerPlaneImage.TranslatesAutoresizingMaskIntoConstraints = false;
+            _centerPlaneImage.ContentMode = UIViewContentMode.ScaleAspectFill;
 
             _valLabelOne = new UILabel();
             _valLabelOne.TranslatesAutoresizingMaskIntoConstraints = false;
@@ -243,25 +234,23 @@ namespace PlaneARViewer.BottomSheet
             _valNameThree.Font = _valNameThree.Font.WithSize(18);
             _valNameThree.AdjustsFontSizeToFitWidth = true;
 
-            this.ContentView.AddSubviews(_valLabelOne, _valLabelThree, _valLabelTwo, _valNameTwo, _valNameOne, _valNameThree);
+            this.ContentView.AddSubviews(_valLabelOne, _valLabelThree, _centerPlaneImage, _valNameOne, _valNameThree);
 
             NSLayoutConstraint.ActivateConstraints(new[]
             {
                 _valLabelOne.LeadingAnchor.ConstraintEqualTo(ContentView.LeadingAnchor, _margin),
                 _valLabelOne.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor, _margin),
-                _valLabelOne.TrailingAnchor.ConstraintEqualTo(_valLabelTwo.LeadingAnchor, -_margin),
+                _valLabelOne.TrailingAnchor.ConstraintEqualTo(_centerPlaneImage.LeadingAnchor, -_margin),
                 _valLabelOne.HeightAnchor.ConstraintEqualTo(32),
                 _valNameOne.HeightAnchor.ConstraintEqualTo(28),
-                _valNameTwo.TopAnchor.ConstraintEqualTo(_valNameOne.TopAnchor),
-                _valNameTwo.BottomAnchor.ConstraintEqualTo(_valNameOne.BottomAnchor),
-                _valNameTwo.LeadingAnchor.ConstraintEqualTo(_valLabelTwo.LeadingAnchor),
-                _valNameTwo.TrailingAnchor.ConstraintEqualTo(_valLabelTwo.TrailingAnchor),
-                _valLabelTwo.CenterXAnchor.ConstraintEqualTo(ContentView.CenterXAnchor),
-                _valLabelTwo.TopAnchor.ConstraintEqualTo(ContentView.TopAnchor),
-                _valLabelTwo.BottomAnchor.ConstraintEqualTo(_valLabelOne.BottomAnchor),
+                _centerPlaneImage.CenterXAnchor.ConstraintEqualTo(ContentView.CenterXAnchor),
+                _centerPlaneImage.CenterYAnchor.ConstraintEqualTo(ContentView.CenterYAnchor),
+                _centerPlaneImage.LeadingAnchor.ConstraintEqualTo(_valLabelOne.TrailingAnchor, _margin),
+                _centerPlaneImage.TrailingAnchor.ConstraintEqualTo(_valNameThree.LeadingAnchor, -_margin),
+                _centerPlaneImage.HeightAnchor.ConstraintEqualTo(48),
                 _valLabelThree.TopAnchor.ConstraintEqualTo(_valLabelOne.TopAnchor),
                 _valLabelThree.BottomAnchor.ConstraintEqualTo(_valLabelOne.BottomAnchor),
-                _valLabelThree.LeadingAnchor.ConstraintEqualTo(_valLabelTwo.TrailingAnchor, _margin),
+                _valLabelThree.LeadingAnchor.ConstraintEqualTo(_centerPlaneImage.TrailingAnchor, _margin),
                 _valLabelThree.TrailingAnchor.ConstraintEqualTo(ContentView.TrailingAnchor, -_margin),
                 _valNameOne.LeadingAnchor.ConstraintEqualTo(_valLabelOne.LeadingAnchor),
                 _valNameOne.TrailingAnchor.ConstraintEqualTo(_valLabelOne.TrailingAnchor),
