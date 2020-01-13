@@ -92,7 +92,7 @@ namespace SharedAirplaneFinder
 
     class AirplaneFinder : INotifyPropertyChanged
     {
-        private Timer _animationTimer;
+        public Timer _animationTimer;
         public Dictionary<String, Plane> planes = new Dictionary<String, Plane>();
         private ModelSceneSymbol smallPlane3DSymbol;
         private ModelSceneSymbol largePlane3DSymbol;
@@ -102,7 +102,7 @@ namespace SharedAirplaneFinder
 
         // Overlay for testing plane graphics.
         public GraphicsOverlay _graphicsOverlay;
-        public int updates_per_second = 5;
+        public int updates_per_second = 30;
         public int seconds_per_query = 10;
         public int small_plane_size = 60;
         public int large_plane_size = 20;
