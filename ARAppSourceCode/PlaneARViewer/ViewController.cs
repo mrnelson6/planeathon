@@ -22,6 +22,7 @@ namespace PlaneARViewer
         private ARSceneView _arView;
         private UILabel _helpLabel;
         private UIToolbar _flyoverToolbar;
+        private UIButton _CalibrateButton;
 
         // Location data source for AR and route tracking.
         private AdjustableLocationDataSource _locationSource = new AdjustableLocationDataSource();
@@ -44,6 +45,8 @@ namespace PlaneARViewer
         // Using the view from an aircraft.
         private bool _fromPlaneView;
         private Camera _groundCamera;
+
+        private bool _IsCalibrating = true;
 
         // Timer control enables stopping and starting frame-by-frame animation.
         private Timer _animationTimer;
@@ -78,7 +81,7 @@ namespace PlaneARViewer
             try
             {
                 // Create and add the scene.
-                _arView.Scene = new Scene(Basemap.CreateImageryWithLabels());
+                _arView.Scene = new Scene(Basemap.CreateImagery());
 
                 // Add the location data source to the AR view.
                 _arView.LocationDataSource = _locationSource;
@@ -202,6 +205,13 @@ namespace PlaneARViewer
             _arView = new ARSceneView();
             _arView.TranslatesAutoresizingMaskIntoConstraints = false;
 
+            _CalibrateButton = new UIButton();
+            _CalibrateButton.TranslatesAutoresizingMaskIntoConstraints = false;
+            _CalibrateButton.SetImage(UIImage.GetSystemImage("globe").ApplyTintColor(UIColor.White), UIControlState.Normal);
+            _CalibrateButton.BackgroundColor = UIColor.SecondarySystemBackgroundColor;
+            _CalibrateButton.Layer.CornerRadius = 8;
+            _CalibrateButton.Layer.Opacity = 0.6f;
+
             //_helpLabel = new UILabel();
             //_helpLabel.TranslatesAutoresizingMaskIntoConstraints = false;
             //_helpLabel.TextAlignment = UITextAlignment.Center;
@@ -220,7 +230,7 @@ namespace PlaneARViewer
             AddChildViewController(_flightInfoVC);
             _flightInfoVC.View.TranslatesAutoresizingMaskIntoConstraints = false;
 
-            View.AddSubviews(_arView, _flyoverToolbar);//, toolbar);//, _helpLabel);
+            View.AddSubviews(_arView, _flyoverToolbar, _CalibrateButton);//, toolbar);//, _helpLabel);
 
             NSLayoutConstraint.ActivateConstraints(new[]
             {
@@ -231,6 +241,10 @@ namespace PlaneARViewer
                 _flyoverToolbar.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
                 _flyoverToolbar.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
                 _flyoverToolbar.BottomAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.BottomAnchor),
+                _CalibrateButton.HeightAnchor.ConstraintEqualTo(48),
+                _CalibrateButton.WidthAnchor.ConstraintEqualTo(48),
+                _CalibrateButton.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, 16),
+                _CalibrateButton.TrailingAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TrailingAnchor, -16)
                 //_helpLabel.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor),
                 //_helpLabel.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
                 //_helpLabel.TrailingAnchor.ConstraintEqualTo(View.TrailingAnchor),
@@ -268,6 +282,21 @@ namespace PlaneARViewer
             _arView.GeoViewTapped += _arView_GeoViewTapped;
             _flightInfoVC.mapButton.TouchUpInside += ShowMapView;
             _flightInfoVC.flyoverButton.TouchUpInside += ShowFlyoverView;
+            _CalibrateButton.TouchUpInside += _CalibrateButton_TouchUpInside;
+        }
+
+        private void _CalibrateButton_TouchUpInside(object sender, EventArgs e)
+        {
+            _IsCalibrating = !_IsCalibrating;
+
+            if (_IsCalibrating)
+            {
+                _arView.Scene.BaseSurface.Opacity = 0.5;
+            }
+            else
+            {
+                _arView.Scene.BaseSurface.Opacity = 0;
+            }
         }
 
         private void ShowFlyoverView(object sender, EventArgs e)
@@ -320,6 +349,7 @@ namespace PlaneARViewer
 
         private async void EnableFromPlaneView()
         {
+            _CalibrateButton.Hidden = true;
             NSLayoutConstraint.DeactivateConstraints(_flightInfoVC_HorizontalConstraints);
             NSLayoutConstraint.DeactivateConstraints(_flightInfoVC_VerticalConstraints);
             _flightInfoVC.View.RemoveFromSuperview();
@@ -346,6 +376,7 @@ namespace PlaneARViewer
 
             // Disable subsurface
             _arView.Scene.BaseSurface.NavigationConstraint = NavigationConstraint.StayAbove;
+            _arView.Scene.BaseSurface.Opacity = 1;
 
             // Disable plane.
             selectedPlane.IsVisible = false;
@@ -386,9 +417,17 @@ namespace PlaneARViewer
 
             // Enable subsurface
             _arView.Scene.BaseSurface.NavigationConstraint = NavigationConstraint.None;
-            _arView.Scene.BaseSurface.Opacity = 0.5;
+            if (_IsCalibrating)
+            {
+                _arView.Scene.BaseSurface.Opacity = 0.5;
+            }
+            else
+            {
+                _arView.Scene.BaseSurface.Opacity = 0;
+            }
 
             _arView.GeoViewTapped += _arView_GeoViewTapped;
+            _CalibrateButton.Hidden = false;
 
             _airportsLayer1.IsVisible = _airportsLayer2.IsVisible =_airportsLayer3.IsVisible = _groundPointsOverlay.IsVisible = false;
         }
@@ -400,6 +439,7 @@ namespace PlaneARViewer
             // Stop ARKit tracking and unsubscribe from events when the view closes.
             await _arView?.StopTrackingAsync();
             _arView.GeoViewTapped -= _arView_GeoViewTapped;
+            _CalibrateButton.TouchUpInside -= _CalibrateButton_TouchUpInside; 
         }
 
         public override void TraitCollectionDidChange(UITraitCollection previousTraitCollection)
