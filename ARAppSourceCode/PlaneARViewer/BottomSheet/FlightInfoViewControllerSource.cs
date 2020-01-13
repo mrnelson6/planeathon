@@ -117,7 +117,7 @@ namespace PlaneARViewer.BottomSheet
                 }
                 else
                 {
-                    _flightStatusViewCell.Update(UIColor.SystemGreenColor, "1:23 PM", "Departure Time", "4:53 PM", "Estimated Arrival");
+                    _flightStatusViewCell.Update(UIColor.SystemGreenColor, takeofftime, "Departure Time", landingTime, "Estimated Arrival");
                 }
             }
 
