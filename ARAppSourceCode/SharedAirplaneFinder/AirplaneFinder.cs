@@ -7,9 +7,7 @@ using Esri.ArcGISRuntime.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -21,8 +19,6 @@ namespace SharedAirplaneFinder
         private double _velocity;
         private double _vertRate;
         private double _heading;
-
-
 
         public Graphic graphic;
         public string callsign
@@ -115,7 +111,7 @@ namespace SharedAirplaneFinder
             get => _selectedPlane;
             set
             {
-                if(_selectedPlane != value)
+                if (_selectedPlane != value)
                 {
                     _selectedPlane = value;
                     UpdateProperty(nameof(SelectedPlane));
@@ -140,7 +136,6 @@ namespace SharedAirplaneFinder
             smallPlane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(await GetSmallPlane()), small_plane_size);
             largePlane3DSymbol = await ModelSceneSymbol.CreateAsync(new Uri(await GetLargePlane()), large_plane_size);
 
-
             _graphicsOverlay.SceneProperties.SurfacePlacement = SurfacePlacement.Absolute;
             SimpleRenderer renderer3D = new SimpleRenderer();
             RendererSceneProperties renderProperties = renderer3D.SceneProperties;
@@ -152,7 +147,6 @@ namespace SharedAirplaneFinder
             _graphicsOverlay.Renderer = renderer3D;
 
             await queryPlanes();
-
 
             _animationTimer = new Timer(1000 / updates_per_second)
             {
@@ -297,7 +291,7 @@ namespace SharedAirplaneFinder
             ServiceFeatureTable sft = new ServiceFeatureTable(new Uri("https://dev0011356.esri.com/server/rest/services/Hosted/Latest_Flights_1578796112/FeatureServer/0"));
 
             MapPoint mp;
-            if(center == null)
+            if (center == null)
             {
                 mp = new MapPoint(-117.18, 33.5556, sr);
             }
@@ -410,7 +404,7 @@ namespace SharedAirplaneFinder
 
         public async Task queryPlanes()
         {
-           // await queryFeatures();
+            // await queryFeatures();
             await addPlanesViaAPI();
         }
 
@@ -438,7 +432,7 @@ namespace SharedAirplaneFinder
             }
             if (updateCounter % (updates_per_second * seconds_per_query) == 0)
             {
-               await queryPlanes();
+                await queryPlanes();
             }
             else
             {
@@ -453,7 +447,7 @@ namespace SharedAirplaneFinder
                         double dz = new_location[0].Z + (plane.Value.vert_rate / updates_per_second);
                         MapPoint ng = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
                         plane.Value.graphic.Geometry = ng;
-                        if(!plane.Value.big_plane)
+                        if (!plane.Value.big_plane)
                         {
                             plane.Value.graphic.Attributes["HEADING"] = plane.Value.heading;
                         }
@@ -484,6 +478,75 @@ namespace SharedAirplaneFinder
         private void UpdateProperty(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public static async Task<Dictionary<string, string>> GetRequest(string callSign)
+        {
+            string URL = $"{"https://flightaware.com/live/flight/"}{callSign}";
+
+            var dict = new Dictionary<string, string>();
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    using (HttpResponseMessage response = await client.GetAsync(URL))
+                    {
+                        using (HttpContent content = response.Content)
+                        {
+                            // Main Data
+                            string data = await content.ReadAsStringAsync();
+                            string iata1 = data.Split("iata\":\"")[1];
+                            string iata2 = data.Split("iata\":\"")[2];
+
+                            // Departure airport
+                            var airport1Strings = iata1.Split("\",\"friendlyName\":\"");
+                            string code1 = airport1Strings[0];
+                            string friendly1 = airport1Strings[1].Split("\",\"")[0];
+
+                            dict.Add("DepAirportCode", code1);
+                            dict.Add("DepAirportName", friendly1);
+
+                            // Arrival airport
+                            var airport2Strings = iata2.Split("\",\"friendlyName\":\"");
+                            string code2 = airport2Strings[0];
+                            string friendly2 = airport2Strings[1].Split("\",\"")[0];
+
+                            dict.Add("ArrAirportCode", code2);
+                            dict.Add("ArrAirportName", friendly2);
+
+                            // Times
+                            string takeoffTime = iata2.Split("\"takeoffTimes\":{\"scheduled\":")[1].Split(",\"est")[0];
+                            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+                            dtDateTime = dtDateTime.AddSeconds(int.Parse(takeoffTime)).ToLocalTime();
+                            string takeOffTimeEnglish = dtDateTime.ToString();
+
+                            dict.Add("TakeoffTime", takeOffTimeEnglish);
+                            dict.Add("TakeoffUnix", takeoffTime);
+
+                            string landingTime = iata2.Split("\"landingTimes\":{\"scheduled\":")[1].Split(",\"est")[0];
+                            dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+                            dtDateTime = dtDateTime.AddSeconds(int.Parse(landingTime)).ToLocalTime();
+                            string landTimeEnglish = dtDateTime.ToString();
+
+                            dict.Add("LandingTime", landTimeEnglish);
+                            dict.Add("LandingUnix", landingTime);
+
+                            // Airplane and airline info
+                            string airlineName = data.Split("<title>")[1].Split(" (")[0];
+                            dict.Add("AirlineName", airlineName);
+
+                            string aircraftType = data.Split("\"aircraftTypeFriendly\":\"")[1].Split("\"")[0];
+                            dict.Add("AirplaneType", aircraftType);
+
+                            return dict;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }
