@@ -16,10 +16,10 @@ namespace PlaneARViewer.BottomSheet
             _dataSource = new FlightInfoViewControllerDataSource();
             TableView.DataSource = _dataSource;
             TableView.AllowsSelection = false;
-            TableView.ScrollEnabled = false;
+            TableView.ScrollEnabled = true;
 
-            mapButton = _dataSource.actionViewCell._MapButton;
-            flyoverButton = _dataSource.actionViewCell._FlyoverButton;
+            mapButton = _dataSource._actionViewCell._MapButton;
+            flyoverButton = _dataSource._actionViewCell._FlyoverButton;
 
             View.Layer.CornerRadius = 16;
             View.Layer.Opacity = 0.9f;

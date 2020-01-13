@@ -18,9 +18,7 @@ namespace PlaneARViewer.BottomSheet
         private TwoPartViewCell _flightStatusViewCell;
         private TwoPartViewCell _flightProviderViewCell;
         private ThreePartViewCell _flightPositionViewCell;
-        private ActionViewCell _actionViewCell;
-
-        public ActionViewCell actionViewCell = new ActionViewCell();
+        public ActionViewCell _actionViewCell;
 
         public Plane _currentPlane;
 
@@ -79,11 +77,11 @@ namespace PlaneARViewer.BottomSheet
             {
                 switch (indexPath.Row)
                 {
-                    case 0: return _actionViewCell;
+                    case 0: return _flightHeaderViewCell;
                     case 1: return _flightStatusViewCell;
                     case 2: return _flightPositionViewCell;
                     case 3: return _flightProviderViewCell;
-                    case 4: return _flightHeaderViewCell;
+                    case 4: return _actionViewCell;
                 }
             }
             return null;
