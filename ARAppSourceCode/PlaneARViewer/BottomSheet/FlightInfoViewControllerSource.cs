@@ -1,4 +1,5 @@
-﻿using Foundation;
+﻿using Esri.ArcGISRuntime.Geometry;
+using Foundation;
 using SharedAirplaneFinder;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace PlaneARViewer.BottomSheet
         public ActionViewCell _actionViewCell;
 
         public Plane _currentPlane;
+        private Dictionary<string, string> _randomFacts;
 
         public FlightInfoViewControllerDataSource() : base()
         {
@@ -33,7 +35,7 @@ namespace PlaneARViewer.BottomSheet
 
         public void SetNewPlane(Plane plane)
         {
-            InvokeOnMainThread(() =>
+            InvokeOnMainThread(async () =>
             {
                 if (_currentPlane != null)
                 {
@@ -42,28 +44,51 @@ namespace PlaneARViewer.BottomSheet
 
                 _currentPlane = plane;
 
-                _currentPlane.PropertyChanged += Plane_PropertyChanged;
-
                 RefreshFromCurrentPlane();
+
+                _randomFacts = await AirplaneFinder.GetRequest(plane.callsign);
+
+                RefreshFromRandomFacts();
+
+                _currentPlane.PropertyChanged += Plane_PropertyChanged;
             });
         }
 
         private void RefreshFromCurrentPlane()
         {
+            string movementName = _currentPlane.vert_rate > 0 ? "Ascent" : "Descent";
+            _flightPositionViewCell.Update($"{_currentPlane.velocity} MPH", "Ground Speed",
+                $"{Math.Abs(_currentPlane.vert_rate)} ft/sec", $"Rate of {movementName}", $"{((MapPoint)_currentPlane.graphic.Geometry).Z} ft", "Current Altitude");
+        }
+
+        private void RefreshFromRandomFacts()
+        {
+            if (_randomFacts == null)
+            {
+                return;
+            }
+
+            string DepAirportCode = _randomFacts[nameof(DepAirportCode)];
+            string DepAirportName = _randomFacts["DepAirportName"];
+            string ArrAirportCode = _randomFacts["ArrAirportCode"];
+            string ArrAirportName = _randomFacts["ArrAirportName"];
+            string AirplaneType = _randomFacts["AirplaneType"];
+            string AirlineName = _randomFacts["AirlineName"];
+            string takeofftime = _randomFacts["TakeoffTime"];
+            string landingTime = _randomFacts["LandingTime"];
+
             if (DateTime.Now.Second > 30) // flight is on time
             {
                 _flightStatusViewCell.Update(UIColor.SystemGreenColor, "1:23 PM", "Departure Time", "4:53 PM", "Estimated Arrival");
             }
             else
             {
-                _flightStatusViewCell.Update(UIColor.SystemRedColor, "1:23 PM", "Departure Time", "4:53 PM", "Estimated Arrival");
+                _flightStatusViewCell.Update(UIColor.SystemRedColor, takeofftime, "Departure Time", landingTime, "Estimated Arrival");
             }
 
-            _flightProviderViewCell.Update(UIColor.LabelColor, "Boeing 787 MAXXX 8", "Aircraft Model", "United Airlines", "Airline");
+            _flightProviderViewCell.Update(UIColor.LabelColor, AirplaneType, "Aircraft Model", AirlineName, "Airline");
 
-            _flightHeaderViewCell.Update("ONT", "Ontario, Intl", "->", "", "SEA", "Seattle-Tacoma Intl.");
-
-            _flightPositionViewCell.Update("324 KPH", "Ground Speed", "4.5 Ft/Sec", "Rate of Ascent", "13,000 ft", "Current Altitude");
+            _flightHeaderViewCell.Update(DepAirportCode, DepAirportName, "->", "", ArrAirportCode, ArrAirportName);
         }
 
         private void Plane_PropertyChanged(object sender, PropertyChangedEventArgs e)
