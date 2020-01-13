@@ -1,11 +1,13 @@
 ﻿using Esri.ArcGISRuntime.ARToolkit;
 using Esri.ArcGISRuntime.Location;
 using Esri.ArcGISRuntime.Mapping;
+using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.UI;
 using PlaneARViewer.BottomSheet;
 using PlaneARViewer.Calibration;
 using SharedAirplaneFinder;
 using System;
+using System.Drawing;
 using System.Linq;
 using System.Timers;
 using UIKit;
@@ -32,6 +34,12 @@ namespace PlaneARViewer
 
         // Overlay for testing plane graphics.
         private GraphicsOverlay _graphicsOverlay;
+
+        // Items on ground, viewable from plane.
+        private GraphicsOverlay _groundPointsOverlay;
+        private FeatureLayer _airportsLayer1;
+        private FeatureLayer _airportsLayer2;
+        private FeatureLayer _airportsLayer3;
 
         // Using the view from an aircraft.
         private bool _fromPlaneView;
@@ -108,6 +116,38 @@ namespace PlaneARViewer
 
                 _panCalibrator = new PanCompassCalibrationGestureRecognizer(_locationSource);
                 View.GestureRecognizers = new[] { _panCalibrator };
+
+                _groundPointsOverlay = new GraphicsOverlay();
+                _groundPointsOverlay.SceneProperties.SurfacePlacement = SurfacePlacement.DrapedBillboarded;
+                _groundPointsOverlay.IsVisible = false;
+                _arView.GraphicsOverlays.Add(_groundPointsOverlay);
+
+                _airportsLayer1 = new FeatureLayer(new Uri("https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Airports_by_scale/FeatureServer/1"));
+                _arView.Scene.OperationalLayers.Add(_airportsLayer1);
+                _airportsLayer1.Renderer = new SimpleRenderer()
+                {
+                    Symbol = new SimpleMarkerSymbol(SimpleMarkerSymbolStyle.Diamond, Color.Orange, 25)
+                };
+                _airportsLayer1.IsVisible = false;
+
+                _airportsLayer2 = new FeatureLayer(new Uri("https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Airports_by_scale/FeatureServer/1"));
+                _arView.Scene.OperationalLayers.Add(_airportsLayer2);
+                _airportsLayer2.Renderer = new SimpleRenderer()
+                {
+                    Symbol = new SimpleMarkerSymbol(SimpleMarkerSymbolStyle.Diamond, Color.Orange, 25)
+                };
+                _airportsLayer2.IsVisible = false;
+
+                _airportsLayer3 = new FeatureLayer(new Uri("https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_Airports_by_scale/FeatureServer/1"));
+                _arView.Scene.OperationalLayers.Add(_airportsLayer3);
+                _airportsLayer3.Renderer = new SimpleRenderer()
+                {
+                    Symbol = new SimpleMarkerSymbol(SimpleMarkerSymbolStyle.Diamond, Color.Orange, 25)
+                };
+                _airportsLayer3.IsVisible = false;
+
+
+
             }
             catch (Exception ex)
             {
@@ -133,6 +173,15 @@ namespace PlaneARViewer
                 _locationSource.SetKnownElevation(elevation + 5.0);
                 _locationSource.LocationChanged -= UpdateElevation;
                 _locationSource.IgnoreLocationUpdate = true;
+
+                // Create ground symbol for user location.
+                SimpleMarkerSymbol userLocationSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbolStyle.X, Color.Green, 25);
+                TextSymbol drapedBillboardedText = new TextSymbol("Your Location", Color.FromArgb(255, 255, 255, 255), 10,
+                    HorizontalAlignment.Center,
+                    VerticalAlignment.Middle);
+                drapedBillboardedText.OffsetY += 20;
+                _groundPointsOverlay.Graphics.Add(new Graphic(e.Position, drapedBillboardedText));
+                _groundPointsOverlay.Graphics.Add(new Graphic(e.Position, userLocationSymbol));
             }
             catch (Exception ex)
             {
@@ -298,6 +347,8 @@ namespace PlaneARViewer
             };
             _animationTimer.Elapsed += (s, e) => AnimationTimerElapsed(callSign);
             _animationTimer.Start();
+
+            _airportsLayer1.IsVisible = _airportsLayer2.IsVisible = _airportsLayer3.IsVisible = _groundPointsOverlay.IsVisible = true;
         }
 
         private void AnimationTimerElapsed(string callSign)
@@ -328,6 +379,8 @@ namespace PlaneARViewer
             _arView.Scene.BaseSurface.Opacity = 0.5;
 
             _arView.GeoViewTapped += _arView_GeoViewTapped;
+
+            _airportsLayer1.IsVisible = _airportsLayer2.IsVisible =_airportsLayer3.IsVisible = _groundPointsOverlay.IsVisible = false;
         }
 
         public override async void ViewDidDisappear(bool animated)
