@@ -315,6 +315,79 @@ namespace SharedAirplaneFinder
             }
         }
 
+        public static async Task<IEnumerable<Plane>> GetPlanes(double xMin, double yMin, double xMax, double yMax)
+        {
+            List<Plane> allPlanes = new List<Plane>();
+            try
+            {
+                string call = "https://matt9678:Window430@opensky-network.org/api/states/all?lamin=" + yMin + "&lomin=" + xMin + "&lamax=" + yMax + "&lomax=" + xMax;
+                var response = await client.GetAsync(call);
+                var responseString = await response.Content.ReadAsStringAsync();
+                Int32 time_message_sent = Convert.ToInt32(responseString.Substring(8, 10));
+                Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                String states = responseString.Substring(30, responseString.Length - 30);
+                String[] elements = states.Split('[');
+
+                for (int i = 0; i < elements.Length; i++)
+                {
+                    String[] attributes = elements[i].Split(',');
+                    if (attributes[5] != "null" || attributes[5] != "null")
+                    {
+                        String callsign = attributes[1].Substring(1, attributes[1].Length - 2);
+                        Int32 last_timestamp = 0;
+                        double lon = Convert.ToDouble(attributes[5]);
+                        double lat = Convert.ToDouble(attributes[6]);
+                        double alt = 0.0;
+                        if (attributes[13] != "null")
+                        {
+                            alt = Convert.ToDouble(attributes[13]);
+                        }
+                        else if (attributes[7] != "null")
+                        {
+                            alt = Convert.ToDouble(attributes[7]);
+                        }
+
+                        double velocity = 0.0;
+                        double heading = 0.0;
+                        double vert_rate = 0.0;
+                        if (attributes[9] != "null")
+                        {
+                            velocity = Convert.ToDouble(attributes[9]);
+                        }
+                        if (attributes[10] != "null")
+                        {
+                            heading = Convert.ToDouble(attributes[10]);
+                        }
+                        if (attributes[11] != "null")
+                        {
+                            vert_rate = Convert.ToDouble(attributes[11]);
+                        }
+                        if (attributes[3] != "null")
+                        {
+                            last_timestamp = Convert.ToInt32(attributes[3]);
+                        }
+                        MapPoint g = new MapPoint(lon, lat, alt, SpatialReferences.Wgs84);
+                        Int32 time_difference = unixTimestamp - last_timestamp;
+
+                        List<MapPoint> lmp = new List<MapPoint>();
+                        lmp.Add(g);
+                        IReadOnlyList<MapPoint> new_location = GeometryEngine.MoveGeodetic(lmp, velocity * time_difference, LinearUnits.Meters, heading, AngularUnits.Degrees, GeodeticCurveType.Geodesic);
+                        double dz = new_location[0].Z + (vert_rate * time_difference);
+                        MapPoint ng = new MapPoint(new_location[0].X, new_location[0].Y, dz, g.SpatialReference);
+
+                        Plane p = new Plane(new Graphic(ng), velocity, vert_rate, heading, last_timestamp, false, callsign);
+                        allPlanes.Add(p);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+
+            return allPlanes;
+        }
+
         //This code is used if we use the FeatureLayer
         private async Task queryFeatures()
         {
