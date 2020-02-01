@@ -136,7 +136,7 @@ namespace SharedAirplaneFinder
 
         public async void setupScene()
         {
-            string licenseKey = "runtimelite,1000,rud2672252234,none,D7MFA0PL4P2SPF002031";
+            string licenseKey = "";
             ArcGISRuntimeEnvironment.SetLicense(licenseKey);
 
             sr = SpatialReferences.Wgs84;
