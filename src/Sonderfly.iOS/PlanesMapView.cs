@@ -1,18 +1,23 @@
-﻿using Esri.ArcGISRuntime.ARToolkit;
-using Esri.ArcGISRuntime.Data;
+﻿// Copyright 2020 Esri.
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at: http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an 
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific 
+// language governing permissions and limitations under the License.
+
 using Esri.ArcGISRuntime.Geometry;
-using Esri.ArcGISRuntime.Location;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.Portal;
 using Esri.ArcGISRuntime.UI;
 using Esri.ArcGISRuntime.UI.Controls;
 using System;
-using System.Linq;
 using UIKit;
 
-namespace PlaneARViewer
+namespace Sonderfly.iOS
 {
-    public partial class PlanesMapView : UIViewController
+    public class PlanesMapView : UIViewController
     {
         // UI objects.
         private MapView mapView;
@@ -45,7 +50,7 @@ namespace PlaneARViewer
         {
             GraphicsOverlay _graphicsOverlay = new GraphicsOverlay();
             GraphicsOverlay _graphicsOverlay2 = new GraphicsOverlay();
-            SharedAirplaneFinder.AirplaneFinder sc = new SharedAirplaneFinder.AirplaneFinder(_graphicsOverlay, _graphicsOverlay2);
+            AirplaneFinder sc = new AirplaneFinder(_graphicsOverlay, _graphicsOverlay2);
             sc.center = center;
             sc.setupScene();
 

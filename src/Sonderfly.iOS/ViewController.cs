@@ -1,22 +1,28 @@
-﻿using Esri.ArcGISRuntime.ARToolkit;
+﻿// Copyright 2020 Esri.
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at: http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an 
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific 
+// language governing permissions and limitations under the License.
+
+using Esri.ArcGISRuntime.ARToolkit;
 using Esri.ArcGISRuntime.Location;
 using Esri.ArcGISRuntime.Mapping;
 using Esri.ArcGISRuntime.Symbology;
 using Esri.ArcGISRuntime.UI;
-using PlaneARViewer.BottomSheet;
-using PlaneARViewer.Calibration;
-using SharedAirplaneFinder;
 using System;
 using System.Drawing;
 using System.Linq;
 using System.Timers;
 using UIKit;
 
-namespace PlaneARViewer
+namespace Sonderfly.iOS
 {
     public partial class ViewController : UIViewController
     {
-        private SharedAirplaneFinder.AirplaneFinder _airplaneFinder;
+        private AirplaneFinder _airplaneFinder;
 
         // UI objects.
         private ARSceneView _arView;
@@ -109,7 +115,7 @@ namespace PlaneARViewer
                 GraphicsOverlay _identifyOverlay = new GraphicsOverlay();
                 
                 _arView.GraphicsOverlays.Add(_graphicsOverlay);
-                _airplaneFinder = new SharedAirplaneFinder.AirplaneFinder(_graphicsOverlay, _identifyOverlay);
+                _airplaneFinder = new AirplaneFinder(_graphicsOverlay, _identifyOverlay);
                 _airplaneFinder.center = _locationSource.LastLocation.Position;
                 _airplaneFinder.setupScene();
                 _flightInfoVC.AssociateAirplaneFinder(_airplaneFinder);
