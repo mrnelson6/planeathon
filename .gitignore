@@ -355,3 +355,5 @@ MigrationBackup/
 .ionide/
 ARAppSourceCode/PlaneARViewer/obj
 *.swp
+.vs
+.DS_Store
