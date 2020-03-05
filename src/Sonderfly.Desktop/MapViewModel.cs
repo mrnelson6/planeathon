@@ -59,7 +59,7 @@ namespace Sonderfly.Desktop
             SceneView.SetViewpointCamera(cm);
 
             GraphicsOverlay graphicsOverlay2 = new GraphicsOverlay();
-            AirplaneFinder sc = new AirplaneFinder(_graphicsOverlay, graphicsOverlay2) {Center = mp};
+            AirplaneFinder sc = new AirplaneFinder(_graphicsOverlay, graphicsOverlay2, false) {Center = mp};
             sc.SetupScene();
         }
 

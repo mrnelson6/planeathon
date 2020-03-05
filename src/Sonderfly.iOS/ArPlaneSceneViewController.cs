@@ -107,7 +107,7 @@ namespace Sonderfly.iOS
                 GraphicsOverlay identifyOverlay = new GraphicsOverlay();
                 
                 _arView.GraphicsOverlays.Add(_graphicsOverlay);
-                _airplaneFinder = new AirplaneFinder(_graphicsOverlay, identifyOverlay)
+                _airplaneFinder = new AirplaneFinder(_graphicsOverlay, identifyOverlay, true)
                 {
                     Center = _locationSource.LastLocation.Position
                 };

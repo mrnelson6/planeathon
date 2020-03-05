@@ -120,6 +120,7 @@ namespace Sonderfly
         private readonly int _largePlaneSize = 20;
         private readonly int _secondsPerCleanup = 30;
         public double CoordinateTolerance = 0.5;
+        private bool _useRealPlanes = true;
 
         public bool ShouldUpdateIdentifyOverlay = true;
 
@@ -147,6 +148,13 @@ namespace Sonderfly
         {
             _graphicsOverlay = go;
             IdentifyOverlay = identifyOverlay;
+        }
+
+        public AirplaneFinder(GraphicsOverlay go, GraphicsOverlay identifyOverlay, bool useRealPlanes)
+        {
+            _graphicsOverlay = go;
+            IdentifyOverlay = identifyOverlay;
+            _useRealPlanes = useRealPlanes;
         }
 
         public async void SetupScene()
@@ -464,12 +472,21 @@ namespace Sonderfly
             await AddPlanesViaApi();
         }
 
-        private int updateCounter = 0;
+        private int updateCounter = -1;
 
         public async void AnimatePlane(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             updateCounter++;
-            if (updateCounter % (_secondsPerCleanup * _updatesPerSecond) == 0)
+            if (!_useRealPlanes && updateCounter == 0)
+            {
+                if (Center == null || (Center.X == 0 && Center.Y == 0))
+                {
+                    updateCounter--;
+                    return;
+                }
+                generateRandomPlanes();
+            }
+            if (_useRealPlanes && (updateCounter % (_secondsPerCleanup * _updatesPerSecond) == 0))
             {
                 List<string> planes_to_remove = new List<string>();
                 int unixTimestamp = (int) (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
@@ -490,7 +507,7 @@ namespace Sonderfly
                 }
             }
 
-            if (updateCounter % (_updatesPerSecond * _secondsPerQuery) == 0)
+            if (_useRealPlanes && (updateCounter % (_updatesPerSecond * _secondsPerQuery) == 0))
             {
                 await QueryPlanes();
             }
@@ -543,6 +560,44 @@ namespace Sonderfly
         {
             await DataManager.DownloadDataItem("21274c9a36f445db912c7c31d2eb78b7");
             return DataManager.GetDataFolder("21274c9a36f445db912c7c31d2eb78b7", "Boeing787", "B_787_8.dae");
+        }
+
+        private void generateRandomPlanes()
+        {
+            int numPlanes = 25;
+            for (int i = 0; i < numPlanes; i++)
+            {
+                Random rng = new Random();
+                
+                double centerX = Center.X + rng.NextDouble() - 0.5;
+                double centerY = Center.Y + rng.NextDouble() - 0.5;
+                double centerZ = Center.Z + (rng.NextDouble() * 9000) + 1000.0;
+                MapPoint point = new MapPoint(centerX, centerY, centerZ, Center.SpatialReference);
+                Graphic gr;
+                bool bigPlane = false;
+                String callsign = "";
+                double velocity = (rng.NextDouble() * 200.0) + 100.0;
+                double heading = rng.NextDouble() * 359.0;
+                if (i < numPlanes / 4)
+                {
+                    callsign = "N" + i;
+                    gr = new Graphic(point, _smallPlane3DSymbol);
+                    gr.Attributes["HEADING"] = heading;
+                    gr.Attributes["CALLSIGN"] = callsign;
+                }
+                else
+                {
+                    callsign = "ARC" + i;
+                    gr = new Graphic(point, _largePlane3DSymbol);
+                    bigPlane = true;
+                    gr.Attributes["HEADING"] = heading + 180;
+                    gr.Attributes["CALLSIGN"] = callsign;
+                }
+                int unixTimestamp = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                Plane p = new Plane(gr, velocity, 0.0, heading, unixTimestamp, bigPlane, callsign);
+                Planes.Add(callsign, p);
+                _graphicsOverlay.Graphics.Add(gr);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
