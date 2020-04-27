@@ -205,7 +205,7 @@ namespace Sonderfly
                 double xMin = en.XMin;
                 double yMin = en.YMin;
 
-                string call = "https://matt9678:Window430@opensky-network.org/api/states/all?lamin=" + yMin +
+                string call = "https://opensky-network.org/api/states/all?lamin=" + yMin +
                               "&lomin=" + xMin + "&lamax=" + yMax + "&lomax=" + xMax;
                 var response = await WebClient.GetAsync(call);
                 var responseString = await response.Content.ReadAsStringAsync();
