@@ -78,6 +78,9 @@
     <Compile Include="Calibration\PanCompassCalibrator.cs" />
     <Compile Include="BottomSheet\FlightInfoViewController.cs" />
     <Compile Include="BottomSheet\FlightInfoViewControllerSource.cs" />
+    <Compile Include="HomeViewController.cs" />
+    <Compile Include="CitySearchController.cs" />
+    <Compile Include="TabletopViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -143,9 +146,21 @@
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon60.png">
       <Visible>false</Visible>
     </ImageAsset>
+    <ImageAsset Include="Assets.xcassets\ARReferenceImage.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\ARReferenceImage.imageset\coolimage.jpg" />
+    <ImageAsset Include="Assets.xcassets\LiveAR.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Tabletop.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Flyover.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\LiveAR.imageset\2017-12-08-09-10-53-1200x629.jpg" />
+    <ImageAsset Include="Assets.xcassets\Tabletop.imageset\Mexico_City_from_above.jpg" />
+    <ImageAsset Include="Assets.xcassets\Flyover.imageset\air-airplane-flight-sky.jpg" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
+    <Folder Include="Assets.xcassets\ARReferenceImage.imageset\" />
+    <Folder Include="Assets.xcassets\LiveAR.imageset\" />
+    <Folder Include="Assets.xcassets\Tabletop.imageset\" />
+    <Folder Include="Assets.xcassets\Flyover.imageset\" />
   </ItemGroup>
   <Import Project="..\Sonderfly.Shared\Sonderfly.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

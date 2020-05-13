@@ -19,6 +19,7 @@ using System.Timers;
 using Sonderfly.iOS.BottomSheet;
 using Sonderfly.iOS.Calibration;
 using UIKit;
+using ARKit;
 
 namespace Sonderfly.iOS
 {
@@ -30,6 +31,7 @@ namespace Sonderfly.iOS
         private ARSceneView _arView;
         private UIToolbar _flyoverToolbar;
         private UIButton _calibrateButton;
+        private UIButton _closeButton;
 
         // Location data source for AR and route tracking.
         private readonly AdjustableLocationDataSource _locationSource = new AdjustableLocationDataSource();
@@ -105,7 +107,7 @@ namespace Sonderfly.iOS
                 _arView.Scene.BaseSurface.NavigationConstraint = NavigationConstraint.StayAbove;
                 _graphicsOverlay = new GraphicsOverlay();
                 GraphicsOverlay identifyOverlay = new GraphicsOverlay();
-                
+
                 _arView.GraphicsOverlays.Add(_graphicsOverlay);
                 _airplaneFinder = new AirplaneFinder(_graphicsOverlay, identifyOverlay)
                 {
@@ -124,7 +126,7 @@ namespace Sonderfly.iOS
 
                 _groundPointsOverlay = new GraphicsOverlay
                 {
-                    SceneProperties = {SurfacePlacement = SurfacePlacement.DrapedBillboarded}, IsVisible = false
+                    SceneProperties = { SurfacePlacement = SurfacePlacement.DrapedBillboarded }, IsVisible = false
                 };
                 _arView.GraphicsOverlays.Add(_groundPointsOverlay);
 
@@ -199,9 +201,9 @@ namespace Sonderfly.iOS
         {
             View = new UIView { BackgroundColor = UIColor.White };
 
-            _flyoverToolbar = new UIToolbar {TranslatesAutoresizingMaskIntoConstraints = false, Hidden = true};
+            _flyoverToolbar = new UIToolbar { TranslatesAutoresizingMaskIntoConstraints = false, Hidden = true };
 
-            _arView = new ARSceneView {TranslatesAutoresizingMaskIntoConstraints = false};
+            _arView = new ARSceneView { TranslatesAutoresizingMaskIntoConstraints = false };
 
             _calibrateButton = new UIButton
             {
@@ -211,7 +213,16 @@ namespace Sonderfly.iOS
             _calibrateButton.Layer.CornerRadius = 8;
             _calibrateButton.Layer.Opacity = 0.6f;
             _calibrateButton.SetImage(UIImage.GetSystemImage("globe").ApplyTintColor(UIColor.White), UIControlState.Normal);
-            
+
+            _closeButton = new UIButton
+            {
+                TranslatesAutoresizingMaskIntoConstraints = false,
+                BackgroundColor = UIColor.SecondarySystemBackgroundColor
+            };
+            _closeButton.Layer.CornerRadius = 8;
+            _closeButton.Layer.Opacity = 0.6f;
+            _closeButton.SetImage(UIImage.GetSystemImage("xmark.circle").ApplyTintColor(UIColor.White), UIControlState.Normal);
+
             var backButton = new UIBarButtonItem() { Title = "Back to ground" };
             backButton.Clicked += (s, e) => DisableFromPlaneView();
             _flyoverToolbar.Items = new[]
@@ -224,7 +235,7 @@ namespace Sonderfly.iOS
             AddChildViewController(_flightInfoVc);
             _flightInfoVc.View.TranslatesAutoresizingMaskIntoConstraints = false;
 
-            View.AddSubviews(_arView, _flyoverToolbar, _calibrateButton);//, toolbar);//, _helpLabel);
+            View.AddSubviews(_arView, _flyoverToolbar, _calibrateButton, _closeButton);//, toolbar);//, _helpLabel);
 
             NSLayoutConstraint.ActivateConstraints(new[]
             {
@@ -238,10 +249,14 @@ namespace Sonderfly.iOS
                 _calibrateButton.HeightAnchor.ConstraintEqualTo(48),
                 _calibrateButton.WidthAnchor.ConstraintEqualTo(48),
                 _calibrateButton.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, 16),
-                _calibrateButton.TrailingAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TrailingAnchor, -16)
+                _calibrateButton.TrailingAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TrailingAnchor, -16),
+                _closeButton.HeightAnchor.ConstraintEqualTo(_calibrateButton.HeightAnchor),
+                _closeButton.WidthAnchor.ConstraintEqualTo(_calibrateButton.WidthAnchor),
+                _closeButton.TopAnchor.ConstraintEqualTo(_calibrateButton.BottomAnchor, 8),
+                _closeButton.TrailingAnchor.ConstraintEqualTo(_calibrateButton.TrailingAnchor)
             });
 
-            _flightInfoVcHorizontalConstraints = new []
+            _flightInfoVcHorizontalConstraints = new[]
             {
                 _flightInfoVc.View.LeadingAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.LeadingAnchor),
                 _flightInfoVc.View.TopAnchor.ConstraintEqualTo(View.SafeAreaLayoutGuide.TopAnchor, 16),
@@ -249,7 +264,7 @@ namespace Sonderfly.iOS
                 _flightInfoVc.View.WidthAnchor.ConstraintEqualTo(320)
             };
 
-            _flightInfoVcVerticalConstraints = new []
+            _flightInfoVcVerticalConstraints = new[]
             {
                 _flightInfoVc.View.BottomAnchor.ConstraintEqualTo(_arView.SafeAreaLayoutGuide.BottomAnchor, -16),
                 _flightInfoVc.View.LeadingAnchor.ConstraintEqualTo(View.LeadingAnchor),
@@ -266,6 +281,7 @@ namespace Sonderfly.iOS
             {
                 NavigationController.NavigationBarHidden = true;
             }
+
             // Start tracking as soon as the view has been shown.
             await _arView.StartTrackingAsync(ARLocationTrackingMode.Continuous);
 
@@ -273,6 +289,13 @@ namespace Sonderfly.iOS
             _flightInfoVc.MapButton.TouchUpInside += ShowMapView;
             _flightInfoVc.FlyoverButton.TouchUpInside += ShowFlyoverView;
             _calibrateButton.TouchUpInside += CalibrateButtonTapped;
+
+            _closeButton.TouchUpInside += _closeButton_TouchUpInside;
+        }
+
+        private void _closeButton_TouchUpInside(object sender, EventArgs e)
+        {
+            NavigationController?.PopViewController(true);
         }
 
         private void CalibrateButtonTapped(object sender, EventArgs e)
@@ -418,6 +441,16 @@ namespace Sonderfly.iOS
             _airportsLayer1.IsVisible = _airportsLayer2.IsVisible =_airportsLayer3.IsVisible = _groundPointsOverlay.IsVisible = false;
         }
 
+        public override void ViewWillDisappear(bool animated)
+        {
+            base.ViewWillDisappear(animated);
+
+            if (NavigationController != null)
+            {
+                NavigationController.NavigationBarHidden = false;
+            }
+        }
+
         public override async void ViewDidDisappear(bool animated)
         {
             base.ViewDidDisappear(animated);
@@ -428,6 +461,7 @@ namespace Sonderfly.iOS
                 await _arView.StopTrackingAsync();
                 _arView.GeoViewTapped -= ArSceneViewTapped;
                 _calibrateButton.TouchUpInside -= CalibrateButtonTapped;
+                _closeButton.TouchUpInside -= _closeButton_TouchUpInside;
             }
         }
 
